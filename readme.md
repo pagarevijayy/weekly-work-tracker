@@ -1,3 +1,5 @@
+<img width="3672" height="1837" alt="screen-1" src="https://github.com/user-attachments/assets/95407c6c-14c6-40e7-8986-87029d333a6b" />
+
 # 🎯 Weekly Work Progress Tracker
 
 A beautifully designed, fully client-side weekly task tracker to help you stay consistent, productive, and goal-oriented throughout your week.
@@ -139,4 +141,11 @@ Inspired by the need to balance deep work, learning, and restful time throughout
 ## 📄 License
 
 MIT License – Feel free to use, share, and modify.
+
+---
+
+## 📸 Snapshots
+
+<img width="3672" height="1837" alt="screen-1" src="https://github.com/user-attachments/assets/95407c6c-14c6-40e7-8986-87029d333a6b" />
+<img width="3638" height="1787" alt="screen-2" src="https://github.com/user-attachments/assets/ca6bacfa-37ed-48b8-87de-e8bbe4e51ef6" />
 
