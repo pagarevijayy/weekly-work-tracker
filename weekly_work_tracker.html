@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Work Tracker</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+    </link>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .week-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .week-nav button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .week-nav button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .current-week {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .week-start-selector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 315px;
+            font-size: 0.9em;
+        }
+
+        .week-start-selector select {
+            border: none;
+            background: transparent;
+            font-size: 0.9em;
+            color: #2d3748;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .export-section {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .import-btn {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .import-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 153, 225, 0.4);
+        }
+
+        .hidden-file-input {
+            display: none;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .day-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+        }
+
+        .day-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .day-card.hard {
+            border-left-color: #e53e3e;
+        }
+
+        .day-card.medium {
+            border-left-color: #dd6b20;
+        }
+
+        .day-card.easy {
+            border-left-color: #38a169;
+        }
+
+        .day-card.chill {
+            border-left-color: #3182ce;
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .day-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .day-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .day-date {
+            font-size: 0.85em;
+            color: #718096;
+            font-weight: normal;
+        }
+
+        .difficulty-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .difficulty-badge.hard {
+            background: #fed7d7;
+            color: #e53e3e;
+        }
+
+        .difficulty-badge.medium {
+            background: #feebc8;
+            color: #dd6b20;
+        }
+
+        .difficulty-badge.easy {
+            background: #c6f6d5;
+            color: #38a169;
+        }
+
+        .difficulty-badge.chill {
+            background: #bee3f8;
+            color: #3182ce;
+        }
+
+        .task-input {
+            display: flex;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .task-input input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: border-color 0.3s ease;
+        }
+
+        .task-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .add-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            background: #5a67d8;
+            transform: scale(1.05);
+        }
+
+        .tasks-list {
+            min-height: 100px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f7fafc;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .task-item:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+            background: #e6fffa;
+        }
+
+        .task-checkbox {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 0.9em;
+        }
+
+        .delete-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .progress-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .weekly-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .motivational-message {
+            text-align: center;
+            font-size: 1.1em;
+            color: #2d3748;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .days-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Weekly Work Tracker</h1>
+            <p>Stay consistent, track progress, achieve your goals!</p>
+        </div>
+
+        <div class="week-nav">
+            <button onclick="changeWeek(-1)">← Previous Week</button>
+            <div class="current-week" id="currentWeek">Week of Dec 9, 2024</div>
+            <button onclick="changeWeek(1)">Next Week →</button>
+        </div>
+
+        <div class="week-start-selector">
+            <label>Week starts on:</label>
+            <select id="weekStartDay" onchange="changeWeekStart()">
+                <option value="1">Monday</option>
+                <option value="2">Tuesday</option>
+                <option value="3">Wednesday</option>
+                <option value="4">Thursday</option>
+                <option value="5">Friday</option>
+                <option value="6">Saturday</option>
+                <option value="0">Sunday</option>
+            </select>
+        </div>
+
+        <div class="days-grid" id="daysGrid">
+            <!-- Days will be generated by JavaScript -->
+        </div>
+
+        <div class="progress-section">
+            <h2 class="progress-title">📊 Weekly Progress</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+            </div>
+            <div class="weekly-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalTasks">0</div>
+                    <div class="stat-label">Total Tasks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completedTasks">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completionRate">0%</div>
+                    <div class="stat-label">Completion Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="streakCount">0</div>
+                    <div class="stat-label">Perfect Days Streak</div>
+                </div>
+            </div>
+            <div class="motivational-message" id="motivationalMessage">
+                Plan your week and start tracking your progress! 💪
+            </div>
+
+            <div class="export-section">
+                <h3 style="color: #2d3748; margin-bottom: 15px;">📁 Data Management</h3>
+                <button class="export-btn" onclick="exportData()">📊 Export Data (JSON)</button>
+                <button class="import-btn" onclick="document.getElementById('fileInput').click()">📥 Import
+                    Data</button>
+                <input type="file" id="fileInput" class="hidden-file-input" accept=".json" onchange="importData(event)">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structure to store tasks for each week
+        let weeklyData = {};
+        let currentWeekOffset = 0;
+        let weekStartDay = 1; // 1 = Monday, 0 = Sunday, etc.
+
+        // Day configurations based on your requirements
+        const dayConfigs = {
+            'Monday': { difficulty: 'hard', description: 'DSA & Core SWE Learning' },
+            'Tuesday': { difficulty: 'hard', description: 'DSA & Core SWE Learning' },
+            'Wednesday': { difficulty: 'medium', description: 'Medium Level Activities' },
+            'Thursday': { difficulty: 'easy', description: 'Light Work' },
+            'Friday': { difficulty: 'chill', description: 'Chill Day' },
+            'Saturday': { difficulty: 'medium', description: 'Medium Level Activities' },
+            'Sunday': { difficulty: 'medium', description: 'Medium Level Activities' }
+        };
+
+        // Motivational messages based on progress
+        const motivationalMessages = [
+            "Every expert was once a beginner. Keep going! 🌟",
+            "Consistency is the mother of mastery! 💪",
+            "You're building something amazing, one day at a time! 🚀",
+            "Progress, not perfection. You're doing great! ✨",
+            "Small steps daily lead to big changes yearly! 🎯",
+            "Your future self will thank you for today's effort! 🙏",
+            "Champions are made in the daily grind! 🏆",
+            "Discipline is choosing between what you want now and what you want most! 💎"
+        ];
+
+        function getCurrentWeekKey() {
+            return `week_${currentWeekOffset}`;
+        }
+
+        function getWeekStartDate(offset = 0) {
+            const today = new Date();
+            const targetDay = new Date(today);
+
+            // Calculate the difference between today and the desired start day
+            const dayDiff = (today.getDay() - weekStartDay + 7) % 7;
+            targetDay.setDate(today.getDate() - dayDiff + (offset * 7));
+
+            return targetDay;
+        }
+
+        function getDayOrder() {
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const orderedDays = [];
+
+            for (let i = 0; i < 7; i++) {
+                orderedDays.push(days[(weekStartDay + i) % 7]);
+            }
+
+            return orderedDays;
+        }
+
+        function changeWeekStart() {
+            weekStartDay = parseInt(document.getElementById('weekStartDay').value);
+            updateWeekDisplay();
+            generateDays();
+            updateProgress();
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        function updateWeekDisplay() {
+            const weekStart = getWeekStartDate(currentWeekOffset);
+            document.getElementById('currentWeek').textContent =
+                `Week of ${formatDate(weekStart)}`;
+        }
+
+        function changeWeek(direction) {
+            currentWeekOffset += direction;
+            updateWeekDisplay();
+            generateDays();
+            updateProgress();
+        }
+
+        function generateDays() {
+            const daysGrid = document.getElementById('daysGrid');
+            daysGrid.innerHTML = '';
+
+            const weekKey = getCurrentWeekKey();
+            if (!weeklyData[weekKey]) {
+                weeklyData[weekKey] = {};
+            }
+
+            const orderedDays = getDayOrder();
+            orderedDays.forEach(dayName => {
+                const config = dayConfigs[dayName];
+                const dayCard = createDayCard(dayName, config, weekKey);
+                daysGrid.appendChild(dayCard);
+            });
+        }
+
+        function createDayCard(dayName, config, weekKey) {
+            const dayCard = document.createElement('div');
+            dayCard.className = `day-card ${config.difficulty}`;
+
+            if (!weeklyData[weekKey][dayName]) {
+                weeklyData[weekKey][dayName] = { tasks: [] };
+            }
+
+            // Calculate the date for this day
+            const weekStart = getWeekStartDate(currentWeekOffset);
+            const orderedDays = getDayOrder();
+            const dayIndex = orderedDays.indexOf(dayName);
+            const dayDate = new Date(weekStart);
+            dayDate.setDate(weekStart.getDate() + dayIndex);
+
+            const formattedDate = dayDate.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
+            });
+
+            dayCard.innerHTML = `
+                <div class="day-header">
+                    <div class="day-info">
+                        <div class="day-name">${dayName}</div>
+                        <div class="day-date">${formattedDate}</div>
+                    </div>
+                    <div class="difficulty-badge ${config.difficulty}">${config.difficulty}</div>
+                </div>
+                <p style="color: #718096; margin-bottom: 15px; font-size: 0.9em;">${config.description}</p>
+                <div class="task-input">
+                    <input type="text" placeholder="Add a task..." 
+                           onkeypress="handleTaskInput(event, '${dayName}', '${weekKey}')"
+                           id="input-${dayName}">
+                    <button class="add-btn" onclick="addTask('${dayName}', '${weekKey}')">Add</button>
+                </div>
+                <div class="tasks-list" id="tasks-${dayName}">
+                    <!-- Tasks will be populated here -->
+                </div>
+            `;
+
+            // Populate existing tasks
+            setTimeout(() => renderTasks(dayName, weekKey), 0);
+
+            return dayCard;
+        }
+
+        function handleTaskInput(event, dayName, weekKey) {
+            if (event.key === 'Enter') {
+                addTask(dayName, weekKey);
+            }
+        }
+
+        function addTask(dayName, weekKey) {
+            const input = document.getElementById(`input-${dayName}`);
+            const taskText = input.value.trim();
+
+            if (taskText) {
+                const task = {
+                    id: Date.now(),
+                    text: taskText,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+
+                weeklyData[weekKey][dayName].tasks.push(task);
+                input.value = '';
+                renderTasks(dayName, weekKey);
+                updateProgress();
+                saveData();
+            }
+        }
+
+        function renderTasks(dayName, weekKey) {
+            const tasksContainer = document.getElementById(`tasks-${dayName}`);
+            const tasks = weeklyData[weekKey][dayName].tasks;
+
+            tasksContainer.innerHTML = tasks.map(task => `
+                <div class="task-item ${task.completed ? 'completed' : ''}" onclick="toggleTaskByClick('${dayName}', ${task.id}, '${weekKey}', event)">
+                    <input type="checkbox" class="task-checkbox" 
+                           ${task.completed ? 'checked' : ''}
+                           onchange="toggleTask('${dayName}', ${task.id}, '${weekKey}')"
+                           onclick="event.stopPropagation()">
+                    <span class="task-text">${task.text}</span>
+                    <button class="delete-btn" onclick="deleteTask('${dayName}', ${task.id}, '${weekKey}'); event.stopPropagation()">
+                        Delete
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function toggleTaskByClick(dayName, taskId, weekKey, event) {
+            // Only toggle if the click wasn't on the checkbox or delete button
+            if (event.target.type !== 'checkbox' && !event.target.classList.contains('delete-btn')) {
+                toggleTask(dayName, taskId, weekKey);
+            }
+        }
+
+        function toggleTask(dayName, taskId, weekKey) {
+            const tasks = weeklyData[weekKey][dayName].tasks;
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                renderTasks(dayName, weekKey);
+                updateProgress();
+                saveData();
+            }
+        }
+
+        function deleteTask(dayName, taskId, weekKey) {
+            weeklyData[weekKey][dayName].tasks =
+                weeklyData[weekKey][dayName].tasks.filter(t => t.id !== taskId);
+            renderTasks(dayName, weekKey);
+            updateProgress();
+            saveData();
+        }
+
+        function calculateStreak() {
+            // Get all weeks in chronological order
+            const weeks = Object.keys(weeklyData).sort();
+            if (weeks.length === 0) return 0;
+
+            let streak = 0;
+            let currentDate = new Date();
+
+            // Start from today and work backwards
+            for (let dayOffset = 0; dayOffset >= -365; dayOffset--) { // Check up to a year back
+                const checkDate = new Date(currentDate);
+                checkDate.setDate(currentDate.getDate() + dayOffset);
+
+                const dayName = checkDate.toLocaleDateString('en-US', { weekday: 'long' });
+
+                // Find which week this date belongs to
+                let weekKey = null;
+                for (const week of weeks) {
+                    const weekOffset = parseInt(week.split('_')[1]);
+                    const weekStart = getWeekStartDate(weekOffset);
+                    const weekEnd = new Date(weekStart);
+                    weekEnd.setDate(weekStart.getDate() + 6);
+
+                    if (checkDate >= weekStart && checkDate <= weekEnd) {
+                        weekKey = week;
+                        break;
+                    }
+                }
+
+                if (!weekKey || !weeklyData[weekKey][dayName] || !weeklyData[weekKey][dayName].tasks.length) {
+                    // No tasks for this day, check if it's in the future
+                    if (dayOffset > 0) continue; // Skip future days
+                    break; // No tasks for past/present day, streak ends
+                }
+
+                const dayTasks = weeklyData[weekKey][dayName].tasks;
+                const allCompleted = dayTasks.every(task => task.completed);
+
+                if (allCompleted && dayTasks.length > 0) {
+                    if (dayOffset <= 0) { // Only count current and past days
+                        streak++;
+                    }
+                } else {
+                    if (dayOffset <= 0) { // Only break streak for current/past days
+                        break;
+                    }
+                }
+            }
+
+            return streak;
+        }
+
+        function updateProgress() {
+            const weekKey = getCurrentWeekKey();
+            const weekData = weeklyData[weekKey] || {};
+
+            let totalTasks = 0;
+            let completedTasks = 0;
+            let daysWithCompletedTasks = 0;
+
+            Object.values(weekData).forEach(dayData => {
+                if (dayData.tasks) {
+                    totalTasks += dayData.tasks.length;
+                    const dayCompleted = dayData.tasks.filter(task => task.completed).length;
+                    completedTasks += dayCompleted;
+                    if (dayCompleted > 0) daysWithCompletedTasks++;
+                }
+            });
+
+            const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            const currentStreak = calculateStreak();
+
+            // Update UI
+            document.getElementById('totalTasks').textContent = totalTasks;
+            document.getElementById('completedTasks').textContent = completedTasks;
+            document.getElementById('completionRate').textContent = `${completionRate}%`;
+            document.getElementById('streakCount').textContent = currentStreak;
+
+            // Update progress bar
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = `${completionRate}%`;
+            progressFill.textContent = `${completionRate}%`;
+
+            // Update motivational message
+            const messageIndex = Math.min(Math.floor(completionRate / 12.5), motivationalMessages.length - 1);
+            document.getElementById('motivationalMessage').textContent =
+                motivationalMessages[messageIndex];
+
+            // Add pulse effect for high completion rates
+            const progressSection = document.querySelector('.progress-section');
+            if (completionRate >= 80) {
+                progressSection.classList.add('pulse');
+            } else {
+                progressSection.classList.remove('pulse');
+            }
+        }
+
+        function exportData() {
+            const exportButton = event.target;
+            const originalText = exportButton.textContent;
+
+            const exportData = {
+                version: "1.0",
+                exportDate: new Date().toISOString(),
+                weekStartDay: weekStartDay,
+                weeklyData: weeklyData,
+                metadata: {
+                    totalWeeks: Object.keys(weeklyData).length,
+                    totalTasks: Object.values(weeklyData).reduce((total, week) => {
+                        return total + Object.values(week).reduce((weekTotal, day) => {
+                            return weekTotal + (day.tasks ? day.tasks.length : 0);
+                        }, 0);
+                    }, 0)
+                }
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `weekly-tracker-data-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Show success message
+            exportButton.textContent = '✅ Exported!';
+            setTimeout(() => {
+                exportButton.textContent = originalText;
+            }, 2000);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+
+                    // Validate the data structure
+                    if (!importedData.weeklyData) {
+                        throw new Error('Invalid data format');
+                    }
+
+                    // Merge with existing data (ask user for confirmation)
+                    const shouldMerge = confirm('Do you want to merge with existing data? Click "OK" to merge, or "Cancel" to replace all data.');
+
+                    if (shouldMerge) {
+                        // Merge data
+                        Object.keys(importedData.weeklyData).forEach(weekKey => {
+                            weeklyData[weekKey] = importedData.weeklyData[weekKey];
+                        });
+                    } else {
+                        // Replace all data
+                        weeklyData = importedData.weeklyData;
+                    }
+
+                    // Update week start day if available
+                    if (importedData.weekStartDay !== undefined) {
+                        weekStartDay = importedData.weekStartDay;
+                        document.getElementById('weekStartDay').value = weekStartDay;
+                    }
+
+                    // Refresh the display
+                    generateDays();
+                    updateProgress();
+
+                    // Show success message
+                    alert(`✅ Data imported successfully!\n\nWeeks imported: ${Object.keys(importedData.weeklyData).length}\nTotal tasks: ${importedData.metadata ? importedData.metadata.totalTasks : 'Unknown'}`);
+
+                } catch (error) {
+                    alert('❌ Error importing data: ' + error.message + '\n\nPlease make sure you selected a valid JSON file exported from this app.');
+                }
+
+                // Reset file input
+                event.target.value = '';
+            };
+
+            reader.readAsText(file);
+        }
+
+        function saveData() {
+            try {
+                const dataToSave = {
+                    weeklyData: weeklyData,
+                    weekStartDay: weekStartDay,
+                    lastSaved: new Date().toISOString()
+                };
+                localStorage.setItem('weeklyTrackerData', JSON.stringify(dataToSave));
+                console.log('✅ Data saved to localStorage');
+            } catch (error) {
+                console.warn('❌ Failed to save to localStorage:', error);
+                // Fallback: keep data in memory for session
+            }
+        }
+
+        function loadData() {
+            try {
+                const savedData = localStorage.getItem('weeklyTrackerData');
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    weeklyData = parsedData.weeklyData || {};
+                    weekStartDay = parsedData.weekStartDay || 1;
+
+                    // Update UI with loaded week start preference
+                    document.getElementById('weekStartDay').value = weekStartDay;
+
+                    console.log('✅ Data loaded from localStorage');
+                } else {
+                    console.log('ℹ️ No saved data found, starting fresh');
+                    weeklyData = {};
+                    weekStartDay = 1;
+                }
+            } catch (error) {
+                console.warn('❌ Failed to load from localStorage:', error);
+                weeklyData = {};
+                weekStartDay = 1;
+            }
+        }
+
+        function autoSave() {
+            saveData();
+            // Auto-save every 30 seconds
+            setTimeout(autoSave, 30000);
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function () {
+            loadData();
+            updateWeekDisplay();
+            generateDays();
+            updateProgress();
+
+            // Start auto-save functionality
+            autoSave();
+
+            // Save data when user leaves the page
+            window.addEventListener('beforeunload', function () {
+                saveData();
+            });
+
+            // Save data when tab becomes hidden (mobile Safari, etc.)
+            document.addEventListener('visibilitychange', function () {
+                if (document.hidden) {
+                    saveData();
+                }
+            });
+
+            // Periodic backup to prevent data loss
+            setInterval(saveData, 60000); // Save every minute as backup
+        });
+    </script>
+</body>
+
+</html>
