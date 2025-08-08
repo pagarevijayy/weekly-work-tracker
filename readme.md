@@ -1,43 +1,46 @@
 <img width="3672" height="1837" alt="screen-1" src="https://github.com/user-attachments/assets/95407c6c-14c6-40e7-8986-87029d333a6b" />
 
-# 🎯 Weekly Work Progress Tracker
+# 🎯 Weekly Work (Progress) Tracker 
 
-A beautifully designed, fully client-side weekly task tracker to help you stay consistent, productive, and goal-oriented throughout your week.
+[![Live Demo](https://img.shields.io/badge/Demo-View%20Now-4CAF50?style=for-the-badge)](https://weekly-work-tracker.vercel.app)
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-%E2%98%95-ffdd57?style=for-the-badge)](https://pagarevijayy.gumroad.com/coffee)
+
+A **local-first, privacy-friendly** weekly task tracker to help you stay consistent, productive, and goal-oriented — with your data stored securely in your own browser.  
+
+Plan your week, track your progress, and keep your motivation high.
+
+---
 
 ## 🧠 Overview
 
-This is a responsive web app to **track daily tasks** based on difficulty levels. Designed to help you manage your week with a structure of hard, medium, easy, and chill days.
+A responsive web app to **track daily tasks** based on difficulty levels. Designed to help you manage your week with a structure of hard, medium, easy, and chill days.
 
-> Example use case: DSA and system design on Monday/Tuesday (hard), lighter work mid-week (medium/easy), and a chill Friday.
+> Example: DSA & system design on Monday/Tuesday (hard), lighter work mid-week (medium/easy), and a chill Friday.
 
 ---
 
 ## 🌟 Features
 
 * 📆 **Weekly Planning & Navigation**
-
   * Navigate between weeks (past and future)
   * Choose the starting day of your week (Monday–Sunday)
 
 * 🗂 **Daily Task Cards**
-
   * Add, complete, or delete tasks for each day
-  * Days are color-coded by difficulty (hard, medium, easy, chill)
+  * Color-coded by difficulty (hard, medium, easy, chill)
 
 * 📊 **Weekly Progress Summary**
-
   * Completion rate & motivational feedback
-  * Task streak counter for perfect days
-  * Dynamic progress bar with pulse effect when you're crushing it 💪
+  * Perfect-day streak counter
+  * Dynamic progress bar with pulse effect for high completion
 
 * 💾 **Data Export/Import**
-
-  * Export your weekly tasks as JSON
-  * Re-import them anytime for backup or transfer
+  * Export tasks as JSON
+  * Re-import anytime for backup or transfer
 
 * 📱 **Responsive Design**
-
-  * Works smoothly on desktop and mobile devices
+  * Works on desktop and mobile
+  * 100% offline after first load
 
 ---
 
@@ -52,14 +55,12 @@ cd weekly-work-tracker
 
 ### 2. Open in Browser
 
-Just open the `index.html` file in your browser:
-
 ```bash
 open index.html
-# or manually double-click it in your file manager
+# or double-click it in your file manager
 ```
 
-> No build step or server required – it's 100% static.
+> No build step or server required – it’s a single HTML file. Works offline.
 
 ---
 
@@ -67,7 +68,7 @@ open index.html
 
 ```
 .
-├── index.html     # Main file with HTML, CSS, and JavaScript combined
+├── index.html     # Main file with HTML, CSS, and JavaScript
 ├── README.md      # You're reading it!
 ```
 
@@ -75,14 +76,10 @@ open index.html
 
 ## ✍️ Customization Tips
 
-* **Difficulty Setup**:
-  You can modify the `dayConfigs` object in the JavaScript section to change task difficulty or descriptions for each day.
-
-* **Motivational Messages**:
-  Want personalized inspiration? Edit the `motivationalMessages` array to suit your style.
-
-* **Styling**:
-  All styles are in a `<style>` block inside the `index.html`. Modify them directly or extract into a `.css` file if you prefer modularity.
+* **Difficulty Setup** – Edit the `dayConfigs` object in JS to adjust difficulty or descriptions.
+* **Motivational Messages** – Update `motivationalMessages` array with your own inspiration.
+* **Styling** – All CSS is in a `<style>` block in `index.html`.  
+  Extract to `.css` if you prefer modularity.
 
 ---
 
@@ -91,10 +88,10 @@ open index.html
 Exported JSON includes:
 
 * `weekStartDay`: 0–6 (Sunday to Saturday)
-* `weeklyData`: Contains tasks per day per week
-* `metadata`: Summary info
+* `weeklyData`: tasks per day per week
+* `metadata`: summary info
 
-Example snippet:
+Example:
 
 ```json
 {
@@ -124,17 +121,20 @@ Example snippet:
 
 * HTML5
 * CSS3
-* JavaScript (Vanilla)
+* Vanilla JavaScript
 
 No frameworks. No dependencies.
 
 ---
 
-## 🙌 Credits
+## 🙌 Credits & Support
 
-Created with 💜 by Vijay Pagare.
+Created with 💜 by Vijay Pagare.  
+Inspired by the need to balance deep work, learning, and restful time throughout the week.  
 
-Inspired by the need to balance deep work, learning, and restful time throughout the week. If you found this useful, consider sharing or contributing!
+If you found this useful, consider sharing it or supporting my work:
+
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-%E2%98%95-ffdd57?style=for-the-badge)](https://pagarevijayy.gumroad.com/coffee)
 
 ---
 
@@ -148,4 +148,3 @@ MIT License – Feel free to use, share, and modify.
 
 <img width="3672" height="1837" alt="screen-1" src="https://github.com/user-attachments/assets/95407c6c-14c6-40e7-8986-87029d333a6b" />
 <img width="3638" height="1787" alt="screen-2" src="https://github.com/user-attachments/assets/ca6bacfa-37ed-48b8-87de-e8bbe4e51ef6" />
-
