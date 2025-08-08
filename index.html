@@ -158,6 +158,24 @@
             box-shadow: 0 5px 15px rgba(66, 153, 225, 0.4);
         }
 
+        .reset-btn {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(229, 62, 62, 0.4);
+        }
+
         .hidden-file-input {
             display: none;
         }
@@ -417,6 +435,51 @@
             font-style: italic;
         }
 
+        .footer {
+            max-width: 1200px;
+            margin: 30px auto 0;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .footer-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            background: rgba(102, 126, 234, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .footer-link:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .footer-credit {
+            color: #718096;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
         @keyframes pulse {
             0% {
                 transform: scale(1);
@@ -452,6 +515,11 @@
 
             body {
                 padding: 10px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 15px;
             }
         }
     </style>
@@ -525,8 +593,24 @@
                 <button class="export-btn" onclick="exportData()">📊 Export Data (JSON)</button>
                 <button class="import-btn" onclick="document.getElementById('fileInput').click()">📥 Import
                     Data</button>
+                <button class="reset-btn" onclick="resetAllData()">🗑️ Reset All Data</button>
                 <input type="file" id="fileInput" class="hidden-file-input" accept=".json" onchange="importData(event)">
             </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-content">
+            <a href="https://twitter.com/pagarevijayy" target="_blank" rel="noopener noreferrer" class="footer-link">
+                𝕏 Follow @pagarevijayy
+            </a>
+            <a href="https://pagarevijayy.gumroad.com/coffee" target="_blank" rel="noopener noreferrer"
+                class="footer-link">
+                ☕ Buy me a coffee
+            </a>
+        </div>
+        <div class="footer-credit">
+            Made with 💜 by Vijay Pagare
         </div>
     </div>
 
@@ -535,6 +619,10 @@
         let weeklyData = {};
         let currentWeekOffset = 0;
         let weekStartDay = 1; // 1 = Monday, 0 = Sunday, etc.
+
+        // Memory management variables
+        let saveTimeout = null;
+        let autoSaveInterval = null;
 
         // Day configurations based on your requirements
         const dayConfigs = {
@@ -590,6 +678,7 @@
             updateWeekDisplay();
             generateDays();
             updateProgress();
+            optimizedSave();
         }
 
         function formatDate(date) {
@@ -698,7 +787,7 @@
                 input.value = '';
                 renderTasks(dayName, weekKey);
                 updateProgress();
-                saveData();
+                optimizedSave();
             }
         }
 
@@ -734,7 +823,7 @@
                 task.completed = !task.completed;
                 renderTasks(dayName, weekKey);
                 updateProgress();
-                saveData();
+                optimizedSave();
             }
         }
 
@@ -743,7 +832,7 @@
                 weeklyData[weekKey][dayName].tasks.filter(t => t.id !== taskId);
             renderTasks(dayName, weekKey);
             updateProgress();
-            saveData();
+            optimizedSave();
         }
 
         function calculateStreak() {
@@ -879,6 +968,50 @@
             }, 2000);
         }
 
+        function resetAllData() {
+            const confirmation = confirm(
+                '⚠️ WARNING: This will permanently delete ALL your data!\n\n' +
+                'This includes:\n' +
+                '• All tasks from all weeks\n' +
+                '• Your progress history\n' +
+                '• Week start preferences\n\n' +
+                'This action cannot be undone.\n\n' +
+                'Are you absolutely sure you want to reset everything?'
+            );
+
+            if (confirmation) {
+                const finalConfirmation = confirm(
+                    '🚨 FINAL WARNING!\n\n' +
+                    'You are about to lose ALL your data permanently.\n\n' +
+                    'Click OK to proceed with the reset, or Cancel to keep your data.'
+                );
+
+                if (finalConfirmation) {
+                    try {
+                        // Clear all data
+                        weeklyData = {};
+                        weekStartDay = 1;
+                        currentWeekOffset = 0;
+
+                        // Clear localStorage
+                        localStorage.removeItem('weeklyTrackerData');
+
+                        // Reset UI
+                        document.getElementById('weekStartDay').value = weekStartDay;
+                        updateWeekDisplay();
+                        generateDays();
+                        updateProgress();
+
+                        alert('✅ All data has been reset successfully!\n\nYou can start fresh with your weekly tracking.');
+
+                    } catch (error) {
+                        alert('❌ Error resetting data: ' + error.message);
+                        console.error('Reset error:', error);
+                    }
+                }
+            }
+        }
+
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -915,6 +1048,7 @@
                     // Refresh the display
                     generateDays();
                     updateProgress();
+                    optimizedSave();
 
                     // Show success message
                     alert(`✅ Data imported successfully!\n\nWeeks imported: ${Object.keys(importedData.weeklyData).length}\nTotal tasks: ${importedData.metadata ? importedData.metadata.totalTasks : 'Unknown'}`);
@@ -928,6 +1062,18 @@
             };
 
             reader.readAsText(file);
+        }
+
+        // Optimized save system to prevent memory leaks
+        function optimizedSave() {
+            // Debounce saves to prevent excessive localStorage writes
+            if (saveTimeout) {
+                clearTimeout(saveTimeout);
+            }
+            saveTimeout = setTimeout(() => {
+                saveData();
+                saveTimeout = null;
+            }, 1000); // Wait 1 second after last change
         }
 
         function saveData() {
@@ -969,10 +1115,24 @@
             }
         }
 
-        function autoSave() {
-            saveData();
-            // Auto-save every 30 seconds
-            setTimeout(autoSave, 30000);
+        function setupAutoSave() {
+            // Clear any existing interval to prevent duplicates
+            if (autoSaveInterval) {
+                clearInterval(autoSaveInterval);
+            }
+            // Auto-save every 2 minutes (reduced frequency to prevent memory issues)
+            autoSaveInterval = setInterval(saveData, 120000);
+        }
+
+        function cleanupTimers() {
+            if (saveTimeout) {
+                clearTimeout(saveTimeout);
+                saveTimeout = null;
+            }
+            if (autoSaveInterval) {
+                clearInterval(autoSaveInterval);
+                autoSaveInterval = null;
+            }
         }
 
         // Initialize the app
@@ -982,11 +1142,12 @@
             generateDays();
             updateProgress();
 
-            // Start auto-save functionality
-            autoSave();
+            // Setup optimized auto-save
+            setupAutoSave();
 
             // Save data when user leaves the page
             window.addEventListener('beforeunload', function () {
+                cleanupTimers();
                 saveData();
             });
 
@@ -997,8 +1158,8 @@
                 }
             });
 
-            // Periodic backup to prevent data loss
-            setInterval(saveData, 60000); // Save every minute as backup
+            // Cleanup on page unload
+            window.addEventListener('unload', cleanupTimers);
         });
     </script>
 </body>
