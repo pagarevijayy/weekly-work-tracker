@@ -36,6 +36,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            overflow-x: hidden;
         }
 
         .container {
@@ -161,10 +162,56 @@
         }
 
         .today-indicator {
-            color: #667eea;
-            font-weight: 600;
-            font-size: 0.8em;
-            margin-left: 5px;
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 700;
+            font-size: 0.75em;
+            padding: 4px 10px;
+            border-radius: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            animation: todayPulse 2s ease-in-out infinite alternate;
+            position: relative;
+            overflow: hidden;
+            zoom: 0.6;
+        }
+
+        .today-indicator::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: todayShimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes todayPulse {
+            0% {
+                transform: scale(1);
+            }
+
+            100% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes todayShimmer {
+            0% {
+                left: -100%;
+            }
+
+            50% {
+                left: 100%;
+            }
+
+            100% {
+                left: 100%;
+            }
         }
 
         .export-section {
@@ -288,6 +335,8 @@
             font-size: 1.3em;
             font-weight: bold;
             color: #2d3748;
+            display: flex;
+            align-items: center;
         }
 
         .day-date {
@@ -663,6 +712,28 @@
             margin-top: 20px;
         }
 
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #667eea;
+            z-index: 9999;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
         @keyframes pulse {
             0% {
                 transform: scale(1);
@@ -800,7 +871,7 @@
             </div>
 
             <div class="export-section">
-                <h3 style="color: #2d3748; margin-bottom: 15px;">📁 Data Management</h3>
+                <h3 style="color: #2d3748; margin-bottom: 15px;">📄 Data Management</h3>
                 <button class="export-btn" onclick="exportData()">📊 Export Data (JSON)</button>
                 <button class="import-btn" onclick="document.getElementById('fileInput').click()">📥 Import
                     Data</button>
@@ -828,17 +899,14 @@
     </div>
 
     <script>
-        // FIXED: Use date-based storage instead of day-name based storage
-        let dailyData = {}; // Changed from weeklyData to dailyData - stores by date string (YYYY-MM-DD)
+        let dailyData = {};
         let currentWeekOffset = 0;
-        let weekStartDay = 1; // 1 = Monday, 0 = Sunday, etc.
-        let isFocusView = false; // Track focus view state
+        let weekStartDay = 1;
+        let isFocusView = false;
 
-        // Memory management variables
         let saveTimeout = null;
         let autoSaveInterval = null;
 
-        // Day configurations based on your requirements
         const dayConfigs = {
             'Monday': { difficulty: 'hard', description: 'DSA & Core SWE Learning' },
             'Tuesday': { difficulty: 'hard', description: 'DSA & Core SWE Learning' },
@@ -849,7 +917,6 @@
             'Sunday': { difficulty: 'medium', description: 'Medium Level Activities' }
         };
 
-        // Motivational messages based on progress
         const motivationalMessages = [
             "Every expert was once a beginner. Keep going! 🌟",
             "Consistency is the mother of mastery! 💪",
@@ -861,7 +928,65 @@
             "Discipline is choosing between what you want now and what you want most! 💎"
         ];
 
-        // FIXED: Helper function to format date as YYYY-MM-DD
+        function createConfetti() {
+            const colors = ['#667eea', '#764ba2', '#48bb78', '#4299e1', '#e53e3e', '#dd6b20', '#38a169', '#3182ce'];
+            const confettiCount = 50;
+
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+
+                    // Random color
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+                    // Random size
+                    const size = Math.random() * 8 + 4;
+                    confetti.style.width = size + 'px';
+                    confetti.style.height = size + 'px';
+
+                    // Random starting position (from both sides)
+                    const fromLeft = Math.random() > 0.5;
+                    confetti.style.left = fromLeft ? Math.random() * 50 + '%' : Math.random() * 50 + 50 + '%';
+                    confetti.style.top = '-10px';
+
+                    // Random animation duration
+                    const duration = Math.random() * 3 + 2;
+                    confetti.style.animationDuration = duration + 's';
+                    confetti.style.animation = `confetti-fall ${duration}s linear forwards`;
+
+                    document.body.appendChild(confetti);
+
+                    // Remove confetti after animation
+                    setTimeout(() => {
+                        if (confetti.parentNode) {
+                            confetti.parentNode.removeChild(confetti);
+                        }
+                    }, duration * 1000);
+                }, i * 50);
+            }
+        }
+
+        function checkAllTasksCompleted() {
+            const dates = isFocusView ? getFocusViewDates() : getWeekViewDates();
+            let totalTasks = 0;
+            let completedTasks = 0;
+
+            dates.forEach(date => {
+                const dateKey = formatDateKey(date);
+                if (dailyData[dateKey] && dailyData[dateKey].tasks) {
+                    const dayTasks = dailyData[dateKey].tasks;
+                    totalTasks += dayTasks.length;
+                    completedTasks += dayTasks.filter(task => task.completed).length;
+                }
+            });
+
+            // Trigger confetti if all tasks are completed and there are tasks
+            if (totalTasks > 0 && completedTasks === totalTasks) {
+                createConfetti();
+            }
+        }
+
         function formatDateKey(date) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -873,7 +998,6 @@
             const today = new Date();
             const targetDay = new Date(today);
 
-            // Calculate the difference between today and the desired start day
             const dayDiff = (today.getDay() - weekStartDay + 7) % 7;
             targetDay.setDate(today.getDate() - dayDiff + (offset * 7));
 
@@ -891,7 +1015,6 @@
             return orderedDays;
         }
 
-        // FIXED: Return actual dates for focus view, not just day names
         function getFocusViewDates() {
             const focusDates = [];
             const today = new Date();
@@ -905,7 +1028,6 @@
             return focusDates;
         }
 
-        // FIXED: Get actual dates for week view
         function getWeekViewDates() {
             const weekDates = [];
             const weekStart = getWeekStartDate(currentWeekOffset);
@@ -964,7 +1086,6 @@
             const daysGrid = document.getElementById('daysGrid');
             daysGrid.innerHTML = '';
 
-            // Show/hide week start selector and placeholder based on view
             const weekStartSelector = document.getElementById('weekStartSelector');
             const focusModePlaceholder = document.getElementById('focusModePlaceholder');
             const weekNav = document.getElementById('weekNav');
@@ -979,7 +1100,6 @@
                 weekNav.style.display = 'flex';
             }
 
-            // FIXED: Get actual dates instead of day names
             const dates = isFocusView ? getFocusViewDates() : getWeekViewDates();
 
             dates.forEach(date => {
@@ -990,18 +1110,16 @@
             });
         }
 
-        // FIXED: Accept date object and use it for storage
         function createDayCard(date, dayName, config) {
             const dateKey = formatDateKey(date);
             const dayCard = document.createElement('div');
             dayCard.className = `day-card ${config.difficulty}`;
-            dayCard.setAttribute('data-date-key', dateKey); // Store date key instead of day name
+            dayCard.setAttribute('data-date-key', dateKey);
             dayCard.ondragover = handleDragOver;
             dayCard.ondrop = handleDrop;
             dayCard.ondragenter = handleDragEnter;
             dayCard.ondragleave = handleDragLeave;
 
-            // FIXED: Initialize data structure by date
             if (!dailyData[dateKey]) {
                 dailyData[dateKey] = { tasks: [] };
             }
@@ -1011,14 +1129,13 @@
                 day: 'numeric'
             });
 
-            // Check if this is today
             const today = new Date();
             const isToday = date.toDateString() === today.toDateString();
 
             dayCard.innerHTML = `
                 <div class="day-header">
                     <div class="day-info">
-                        <div class="day-name">${dayName}${isToday ? ' <span class="today-indicator">(Today)</span>' : ''}</div>
+                        <div class="day-name">${dayName}${isToday ? ' <span class="today-indicator">Today</span>' : ''}</div>
                         <div class="day-date">${formattedDate}</div>
                     </div>
                     <div class="difficulty-badge ${config.difficulty}">${config.difficulty}</div>
@@ -1035,13 +1152,11 @@
                 </div>
             `;
 
-            // Populate existing tasks
             setTimeout(() => renderTasks(dateKey), 0);
 
             return dayCard;
         }
 
-        // FIXED: Use dateKey instead of dayName and weekKey
         function handleTaskInput(event, dateKey) {
             if (event.key === 'Enter') {
                 addTask(dateKey);
@@ -1100,6 +1215,7 @@
                 task.completed = !task.completed;
                 renderTasks(dateKey);
                 updateProgress();
+                checkAllTasksCompleted(); // Check for confetti
                 optimizedSave();
             }
         }
@@ -1151,13 +1267,12 @@
 
         function handleEditKeyPress(event, dateKey, taskId) {
             if (event.key === 'Enter') {
-                event.target.blur(); // This will trigger onblur and save
+                event.target.blur();
             } else if (event.key === 'Escape') {
                 cancelEditTask(dateKey, taskId);
             }
         }
 
-        // FIXED: Drag and Drop functionality with proper cleanup
         let draggedTask = null;
 
         function handleDragStart(event) {
@@ -1170,7 +1285,6 @@
         }
 
         function handleDragEnd(event) {
-            // Clean up dragging state
             event.target.classList.remove('dragging');
             document.querySelectorAll('.day-card').forEach(card => {
                 card.classList.remove('drag-over');
@@ -1188,25 +1302,20 @@
         function handleDragEnter(event) {
             event.preventDefault();
 
-            // Handle day card drag-over
             const dayCard = event.target.closest('.day-card');
             if (dayCard && draggedTask) {
-                // Remove drag-over from all other cards
                 document.querySelectorAll('.day-card').forEach(card => {
                     if (card !== dayCard) card.classList.remove('drag-over');
                 });
                 dayCard.classList.add('drag-over');
             }
 
-            // Handle task item reordering
             const taskItem = event.target.closest('.task-item');
             if (taskItem && draggedTask) {
-                // Remove reorder-target from all other tasks
                 document.querySelectorAll('.task-item').forEach(item => {
                     if (item !== taskItem) item.classList.remove('reorder-target');
                 });
 
-                // Only show reorder target if it's the same date
                 if (taskItem.dataset.dateKey === draggedTask.dateKey) {
                     taskItem.classList.add('reorder-target');
                 }
@@ -1214,7 +1323,6 @@
         }
 
         function handleDragLeave(event) {
-            // Only remove if we're leaving the element entirely
             const dayCard = event.target.closest('.day-card');
             if (dayCard && !dayCard.contains(event.relatedTarget)) {
                 dayCard.classList.remove('drag-over');
@@ -1229,7 +1337,6 @@
         function handleDrop(event) {
             event.preventDefault();
 
-            // Clean up all drag-over styling
             document.querySelectorAll('.day-card').forEach(card => {
                 card.classList.remove('drag-over');
             });
@@ -1245,21 +1352,17 @@
             const targetDateKey = targetDayCard.getAttribute('data-date-key');
             if (!targetDateKey) return;
 
-            // Check if dropping on a task item for reordering
             const targetTaskItem = event.target.closest('.task-item');
             if (targetTaskItem && targetTaskItem.dataset.dateKey === draggedTask.dateKey) {
-                // Reordering within same date
                 const sourceTasks = dailyData[draggedTask.dateKey].tasks;
                 const taskIndex = sourceTasks.findIndex(t => t.id === draggedTask.id);
                 if (taskIndex === -1) return;
 
                 const [movedTask] = sourceTasks.splice(taskIndex, 1);
 
-                // Find target position
                 const targetTaskId = parseInt(targetTaskItem.dataset.taskId);
                 const targetIndex = sourceTasks.findIndex(t => t.id === targetTaskId);
 
-                // Insert at target position
                 if (targetIndex !== -1) {
                     sourceTasks.splice(targetIndex, 0, movedTask);
                 } else {
@@ -1270,59 +1373,51 @@
                 updateProgress();
                 optimizedSave();
             } else {
-                // Moving between different dates
                 const sourceDateKey = draggedTask.dateKey;
                 const sourceTasks = dailyData[sourceDateKey].tasks;
                 const taskIndex = sourceTasks.findIndex(t => t.id === draggedTask.id);
 
                 if (taskIndex === -1) return;
 
-                // Remove from source
                 const [movedTask] = sourceTasks.splice(taskIndex, 1);
 
-                // Add to target
                 if (!dailyData[targetDateKey]) {
                     dailyData[targetDateKey] = { tasks: [] };
                 }
                 dailyData[targetDateKey].tasks.push(movedTask);
 
-                // Update both date displays
                 renderTasks(sourceDateKey);
                 renderTasks(targetDateKey);
                 updateProgress();
                 optimizedSave();
             }
 
-            // Reset dragged task
             draggedTask = null;
         }
 
-        // FIXED: Calculate streak using date-based data
         function calculateStreak() {
             let streak = 0;
             const today = new Date();
 
-            // Start from today and work backwards
             for (let dayOffset = 0; dayOffset >= -365; dayOffset--) {
                 const checkDate = new Date(today);
                 checkDate.setDate(today.getDate() + dayOffset);
                 const dateKey = formatDateKey(checkDate);
 
                 if (!dailyData[dateKey] || !dailyData[dateKey].tasks.length) {
-                    // No tasks for this day, check if it's in the future
-                    if (dayOffset > 0) continue; // Skip future days
-                    break; // No tasks for past/present day, streak ends
+                    if (dayOffset > 0) continue;
+                    break;
                 }
 
                 const dayTasks = dailyData[dateKey].tasks;
                 const allCompleted = dayTasks.every(task => task.completed);
 
                 if (allCompleted && dayTasks.length > 0) {
-                    if (dayOffset <= 0) { // Only count current and past days
+                    if (dayOffset <= 0) {
                         streak++;
                     }
                 } else {
-                    if (dayOffset <= 0) { // Only break streak for current/past days
+                    if (dayOffset <= 0) {
                         break;
                     }
                 }
@@ -1331,7 +1426,6 @@
             return streak;
         }
 
-        // FIXED: Update progress to work with current view's dates
         function updateProgress() {
             const dates = isFocusView ? getFocusViewDates() : getWeekViewDates();
 
@@ -1353,23 +1447,19 @@
             const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
             const currentStreak = calculateStreak();
 
-            // Update UI
             document.getElementById('totalTasks').textContent = totalTasks;
             document.getElementById('completedTasks').textContent = completedTasks;
             document.getElementById('completionRate').textContent = `${completionRate}%`;
             document.getElementById('streakCount').textContent = currentStreak;
 
-            // Update progress bar
             const progressFill = document.getElementById('progressFill');
             progressFill.style.width = `${completionRate}%`;
             progressFill.textContent = `${completionRate}%`;
 
-            // Update motivational message
             const messageIndex = Math.min(Math.floor(completionRate / 12.5), motivationalMessages.length - 1);
             document.getElementById('motivationalMessage').textContent =
                 motivationalMessages[messageIndex];
 
-            // Add pulse effect for high completion rates
             const progressSection = document.querySelector('.progress-section');
             if (completionRate >= 80) {
                 progressSection.classList.add('pulse');
@@ -1383,11 +1473,11 @@
             const originalText = exportButton.textContent;
 
             const exportData = {
-                version: "2.0", // Updated version for new data structure
+                version: "2.0",
                 exportDate: new Date().toISOString(),
                 weekStartDay: weekStartDay,
                 isFocusView: isFocusView,
-                dailyData: dailyData, // Changed from weeklyData to dailyData
+                dailyData: dailyData,
                 metadata: {
                     totalDays: Object.keys(dailyData).length,
                     totalTasks: Object.values(dailyData).reduce((total, day) => {
@@ -1407,7 +1497,6 @@
             document.body.removeChild(link);
             URL.revokeObjectURL(link.href);
 
-            // Show success message
             exportButton.textContent = '✅ Exported!';
             setTimeout(() => {
                 exportButton.textContent = originalText;
@@ -1434,16 +1523,13 @@
 
                 if (finalConfirmation) {
                     try {
-                        // Clear all data
                         dailyData = {};
                         weekStartDay = 1;
                         currentWeekOffset = 0;
                         isFocusView = false;
 
-                        // Clear localStorage
                         localStorage.removeItem('weeklyTrackerData');
 
-                        // Reset UI
                         document.getElementById('weekStartDay').value = weekStartDay;
                         document.getElementById('focusViewToggle').checked = false;
                         updateViewLabel();
@@ -1461,7 +1547,6 @@
             }
         }
 
-        // FIXED: Import function to handle both old and new data formats
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1471,18 +1556,13 @@
                 try {
                     const importedData = JSON.parse(e.target.result);
 
-                    // Handle both old (weeklyData) and new (dailyData) formats
                     let dataToImport = {};
 
                     if (importedData.dailyData) {
-                        // New format - direct import
                         dataToImport = importedData.dailyData;
                     } else if (importedData.weeklyData) {
-                        // Old format - convert to new format
                         console.log('Converting old data format to new date-based format...');
 
-                        // This conversion is approximate since we don't have exact dates
-                        // We'll need to make best guesses based on week offsets
                         Object.keys(importedData.weeklyData).forEach(weekKey => {
                             const weekOffset = parseInt(weekKey.split('_')[1]);
                             const weekStartDate = getWeekStartDate(weekOffset);
@@ -1500,20 +1580,16 @@
                         throw new Error('Invalid data format - no dailyData or weeklyData found');
                     }
 
-                    // Merge with existing data
                     const shouldMerge = confirm('Do you want to merge with existing data? Click "OK" to merge, or "Cancel" to replace all data.');
 
                     if (shouldMerge) {
-                        // Merge data
                         Object.keys(dataToImport).forEach(dateKey => {
                             dailyData[dateKey] = dataToImport[dateKey];
                         });
                     } else {
-                        // Replace all data
                         dailyData = dataToImport;
                     }
 
-                    // Update settings if available
                     if (importedData.weekStartDay !== undefined) {
                         weekStartDay = importedData.weekStartDay;
                         document.getElementById('weekStartDay').value = weekStartDay;
@@ -1525,12 +1601,10 @@
                         updateViewLabel();
                     }
 
-                    // Refresh the display
                     generateDays();
                     updateProgress();
                     optimizedSave();
 
-                    // Show success message
                     const totalDays = Object.keys(dataToImport).length;
                     const totalTasks = Object.values(dataToImport).reduce((total, day) => {
                         return total + (day.tasks ? day.tasks.length : 0);
@@ -1543,29 +1617,26 @@
                     console.error('Import error:', error);
                 }
 
-                // Reset file input
                 event.target.value = '';
             };
 
             reader.readAsText(file);
         }
 
-        // Optimized save system to prevent memory leaks
         function optimizedSave() {
-            // Debounce saves to prevent excessive localStorage writes
             if (saveTimeout) {
                 clearTimeout(saveTimeout);
             }
             saveTimeout = setTimeout(() => {
                 saveData();
                 saveTimeout = null;
-            }, 1000); // Wait 1 second after last change
+            }, 1000);
         }
 
         function saveData() {
             try {
                 const dataToSave = {
-                    dailyData: dailyData, // Changed from weeklyData
+                    dailyData: dailyData,
                     weekStartDay: weekStartDay,
                     isFocusView: isFocusView,
                     lastSaved: new Date().toISOString()
@@ -1574,23 +1645,18 @@
                 console.log('✅ Data saved to localStorage');
             } catch (error) {
                 console.warn('❌ Failed to save to localStorage:', error);
-                // Fallback: keep data in memory for session
             }
         }
 
-        // FIXED: Load function to handle both old and new data formats
         function loadData() {
             try {
                 const savedData = localStorage.getItem('weeklyTrackerData');
                 if (savedData) {
                     const parsedData = JSON.parse(savedData);
 
-                    // Handle both old and new data formats
                     if (parsedData.dailyData) {
-                        // New format
                         dailyData = parsedData.dailyData || {};
                     } else if (parsedData.weeklyData) {
-                        // Old format - convert to new format
                         console.log('Converting saved data from old format to new date-based format...');
                         dailyData = {};
 
@@ -1608,7 +1674,6 @@
                             });
                         });
 
-                        // Save converted data
                         saveData();
                     } else {
                         dailyData = {};
@@ -1617,7 +1682,6 @@
                     weekStartDay = parsedData.weekStartDay || 1;
                     isFocusView = parsedData.isFocusView || false;
 
-                    // Update UI with loaded preferences
                     document.getElementById('weekStartDay').value = weekStartDay;
                     document.getElementById('focusViewToggle').checked = isFocusView;
                     updateViewLabel();
@@ -1638,11 +1702,9 @@
         }
 
         function setupAutoSave() {
-            // Clear any existing interval to prevent duplicates
             if (autoSaveInterval) {
                 clearInterval(autoSaveInterval);
             }
-            // Auto-save every 2 minutes (reduced frequency to prevent memory issues)
             autoSaveInterval = setInterval(saveData, 120000);
         }
 
@@ -1657,30 +1719,25 @@
             }
         }
 
-        // Initialize the app
         document.addEventListener('DOMContentLoaded', function () {
             loadData();
             updateWeekDisplay();
             generateDays();
             updateProgress();
 
-            // Setup optimized auto-save
             setupAutoSave();
 
-            // Save data when user leaves the page
             window.addEventListener('beforeunload', function () {
                 cleanupTimers();
                 saveData();
             });
 
-            // Save data when tab becomes hidden (mobile Safari, etc.)
             document.addEventListener('visibilitychange', function () {
                 if (document.hidden) {
                     saveData();
                 }
             });
 
-            // Cleanup on page unload
             window.addEventListener('unload', cleanupTimers);
         });
     </script>
