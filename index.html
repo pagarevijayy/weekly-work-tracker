@@ -53,6 +53,19 @@
             margin-bottom: 30px;
         }
 
+        .header-content {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-text {
+            text-align: center;
+        }
+
         .header h1 {
             color: #2d3748;
             font-size: 2.5em;
@@ -104,6 +117,7 @@
             margin: 20px auto;
             max-width: 315px;
             font-size: 0.9em;
+            height: 30px;
         }
 
         .week-start-selector select {
@@ -113,6 +127,44 @@
             color: #2d3748;
             cursor: pointer;
             outline: none;
+        }
+
+        .focus-mode-placeholder {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            max-width: 315px;
+            height: 30px;
+        }
+
+        .focus-mode-message {
+            text-align: center;
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        .focus-mode-message span {
+            font-size: 1.5em;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .focus-mode-message p {
+            margin: 0 0 5px 0;
+            font-weight: 500;
+        }
+
+        .focus-mode-message small {
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        .today-indicator {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.8em;
+            margin-left: 5px;
         }
 
         .export-section {
@@ -322,6 +374,141 @@
             cursor: pointer;
         }
 
+        .task-text {
+            flex: 1;
+            font-size: 0.9em;
+            user-select: none;
+        }
+
+        .task-item.editing {
+            background: #e6fffa;
+            border: 2px solid #667eea;
+        }
+
+        .task-edit-input {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            font-size: 0.9em;
+            margin-right: 10px;
+            background: white;
+        }
+
+
+
+        .task-edit-input:focus {
+            outline: none;
+            border-color: #5a67d8;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .edit-btn {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+
+
+        .view-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e2e8f0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked+.slider {
+            background-color: #667eea;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        .view-label {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.95em;
+        }
+
+        .day-card.drag-over {
+            background: #f0fff4;
+            border: 2px dashed #38a169;
+            transform: scale(1.02);
+        }
+
+        .task-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .task-item.drag-over {
+            border-top: 3px solid #667eea;
+        }
+
+        .task-item.reorder-target {
+            border-top: 3px solid #38a169;
+            background: #f0fff4;
+        }
+
         .task-item:hover {
             background: #edf2f7;
             transform: translateX(5px);
@@ -477,7 +664,7 @@
         .footer-credit {
             color: #718096;
             font-size: 0.9em;
-            margin-top: 10px;
+            margin-top: 20px;
         }
 
         @keyframes pulse {
@@ -513,6 +700,17 @@
                 margin: 1em 0;
             }
 
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .view-toggle {
+                position: static;
+                justify-content: center;
+                margin-top: 10px;
+            }
+
             body {
                 padding: 10px;
             }
@@ -534,17 +732,28 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 Weekly Work Tracker</h1>
-            <p>Stay consistent, track progress, achieve your goals!</p>
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>🚀 Weekly Work Tracker</h1>
+                    <p>Stay consistent, track progress, achieve your goals!</p>
+                </div>
+                <div class="view-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="focusViewToggle" onchange="toggleView()">
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="view-label" id="viewLabel">Week View</span>
+                </div>
+            </div>
         </div>
 
-        <div class="week-nav">
+        <div class="week-nav" id="weekNav">
             <button onclick="changeWeek(-1)">← Previous Week</button>
             <div class="current-week" id="currentWeek">Week of Dec 9, 2024</div>
             <button onclick="changeWeek(1)">Next Week →</button>
         </div>
 
-        <div class="week-start-selector">
+        <div class="week-start-selector" id="weekStartSelector">
             <label>Week starts on:</label>
             <select id="weekStartDay" onchange="changeWeekStart()">
                 <option value="1">Monday</option>
@@ -556,6 +765,14 @@
                 <option value="0">Sunday</option>
             </select>
         </div>
+
+        <div class="focus-mode-placeholder" id="focusModePlaceholder" style="display: none;">
+            <div class="focus-mode-message">
+                <p>🎯 You're in Focus Mode! Win your day. </p>
+            </div>
+        </div>
+
+
 
         <div class="days-grid" id="daysGrid">
             <!-- Days will be generated by JavaScript -->
@@ -606,11 +823,13 @@
             </a>
             <a href="https://pagarevijayy.gumroad.com/coffee" target="_blank" rel="noopener noreferrer"
                 class="footer-link">
-                ☕ Buy me a coffee
+                ☕ Pay what you like
             </a>
         </div>
         <div class="footer-credit">
-            Made with 💜 by Vijay Pagare
+            Made with 💜 by <a style="text-decoration: none; color: unset;" href="http://vijaypagare.in/about"
+                target="_blank" rel="noopener noreferrer">Vijay
+                Pagare</a>
         </div>
     </div>
 
@@ -619,6 +838,7 @@
         let weeklyData = {};
         let currentWeekOffset = 0;
         let weekStartDay = 1; // 1 = Monday, 0 = Sunday, etc.
+        let isFocusView = false; // Track focus view state
 
         // Memory management variables
         let saveTimeout = null;
@@ -651,6 +871,8 @@
             return `week_${currentWeekOffset}`;
         }
 
+
+
         function getWeekStartDate(offset = 0) {
             const today = new Date();
             const targetDay = new Date(today);
@@ -671,6 +893,34 @@
             }
 
             return orderedDays;
+        }
+
+        function getFocusViewDayOrder() {
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const today = new Date();
+
+            // Start from today and go forward for exactly 7 consecutive days
+            const focusDays = [];
+            for (let i = 0; i < 7; i++) {
+                const targetDate = new Date(today);
+                targetDate.setDate(today.getDate() + i);
+                const dayIndex = targetDate.getDay();
+                focusDays.push(days[dayIndex]);
+            }
+
+            return focusDays;
+        }
+
+        function toggleView() {
+            isFocusView = document.getElementById('focusViewToggle').checked;
+            updateViewLabel();
+            generateDays();
+            optimizedSave();
+        }
+
+        function updateViewLabel() {
+            const label = document.getElementById('viewLabel');
+            label.textContent = isFocusView ? 'Focus View' : 'Week View';
         }
 
         function changeWeekStart() {
@@ -711,7 +961,22 @@
                 weeklyData[weekKey] = {};
             }
 
-            const orderedDays = getDayOrder();
+            // Show/hide week start selector and placeholder based on view
+            const weekStartSelector = document.getElementById('weekStartSelector');
+            const focusModePlaceholder = document.getElementById('focusModePlaceholder');
+            const weekNav = document.getElementById('weekNav');
+
+            if (isFocusView) {
+                weekStartSelector.style.display = 'none';
+                focusModePlaceholder.style.display = 'flex';
+                weekNav.style.display = 'none';
+            } else {
+                weekStartSelector.style.display = 'flex';
+                focusModePlaceholder.style.display = 'none';
+                weekNav.style.display = 'flex';
+            }
+
+            const orderedDays = isFocusView ? getFocusViewDayOrder() : getDayOrder();
             orderedDays.forEach(dayName => {
                 const config = dayConfigs[dayName];
                 const dayCard = createDayCard(dayName, config, weekKey);
@@ -722,27 +987,50 @@
         function createDayCard(dayName, config, weekKey) {
             const dayCard = document.createElement('div');
             dayCard.className = `day-card ${config.difficulty}`;
+            dayCard.ondragover = handleDragOver;
+            dayCard.ondrop = handleDrop;
+            dayCard.ondragenter = handleDragEnter;
+            dayCard.ondragleave = handleDragLeave;
+
+            if (!weeklyData[weekKey]) {
+                weeklyData[weekKey] = {};
+            }
 
             if (!weeklyData[weekKey][dayName]) {
                 weeklyData[weekKey][dayName] = { tasks: [] };
             }
 
             // Calculate the date for this day
-            const weekStart = getWeekStartDate(currentWeekOffset);
-            const orderedDays = getDayOrder();
-            const dayIndex = orderedDays.indexOf(dayName);
-            const dayDate = new Date(weekStart);
-            dayDate.setDate(weekStart.getDate() + dayIndex);
+            let dayDate;
+            if (isFocusView) {
+                // In focus view, calculate dates from today forward
+                const today = new Date();
+                const orderedDays = getFocusViewDayOrder();
+                const dayIndex = orderedDays.indexOf(dayName);
+                dayDate = new Date(today);
+                dayDate.setDate(today.getDate() + dayIndex);
+            } else {
+                // In week view, calculate dates from week start
+                const weekStart = getWeekStartDate(currentWeekOffset);
+                const orderedDays = getDayOrder();
+                const dayIndex = orderedDays.indexOf(dayName);
+                dayDate = new Date(weekStart);
+                dayDate.setDate(weekStart.getDate() + dayIndex);
+            }
 
             const formattedDate = dayDate.toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric'
             });
 
+            // Check if this is today
+            const today = new Date();
+            const isToday = dayDate.toDateString() === today.toDateString();
+
             dayCard.innerHTML = `
                 <div class="day-header">
                     <div class="day-info">
-                        <div class="day-name">${dayName}</div>
+                        <div class="day-name">${dayName}${isToday ? ' <span class="today-indicator">(Today)</span>' : ''}</div>
                         <div class="day-date">${formattedDate}</div>
                     </div>
                     <div class="difficulty-badge ${config.difficulty}">${config.difficulty}</div>
@@ -796,12 +1084,23 @@
             const tasks = weeklyData[weekKey][dayName].tasks;
 
             tasksContainer.innerHTML = tasks.map(task => `
-                <div class="task-item ${task.completed ? 'completed' : ''}" onclick="toggleTaskByClick('${dayName}', ${task.id}, '${weekKey}', event)">
+                <div class="task-item ${task.completed ? 'completed' : ''}" 
+                     data-task-id="${task.id}" 
+                     data-day="${dayName}" 
+                     data-week="${weekKey}"
+                     draggable="true"
+                     onclick="toggleTask('${dayName}', ${task.id}, '${weekKey}')"
+                     ondragstart="handleDragStart(event)"
+                     ondragover="handleDragOver(event)"
+                     ondrop="handleDrop(event)"
+                     ondragenter="handleDragEnter(event)"
+                     ondragleave="handleDragLeave(event)">
                     <input type="checkbox" class="task-checkbox" 
                            ${task.completed ? 'checked' : ''}
                            onchange="toggleTask('${dayName}', ${task.id}, '${weekKey}')"
                            onclick="event.stopPropagation()">
-                    <span class="task-text">${task.text}</span>
+                    <span class="task-text" id="task-text-${task.id}" 
+                          ondblclick="startEditTask('${dayName}', ${task.id}, '${weekKey}'); event.stopPropagation()">${task.text}</span>
                     <button class="delete-btn" onclick="deleteTask('${dayName}', ${task.id}, '${weekKey}'); event.stopPropagation()">
                         Delete
                     </button>
@@ -809,12 +1108,7 @@
             `).join('');
         }
 
-        function toggleTaskByClick(dayName, taskId, weekKey, event) {
-            // Only toggle if the click wasn't on the checkbox or delete button
-            if (event.target.type !== 'checkbox' && !event.target.classList.contains('delete-btn')) {
-                toggleTask(dayName, taskId, weekKey);
-            }
-        }
+
 
         function toggleTask(dayName, taskId, weekKey) {
             const tasks = weeklyData[weekKey][dayName].tasks;
@@ -833,6 +1127,189 @@
             renderTasks(dayName, weekKey);
             updateProgress();
             optimizedSave();
+        }
+
+        function startEditTask(dayName, taskId, weekKey) {
+            const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
+            const taskText = document.getElementById(`task-text-${taskId}`);
+            const task = weeklyData[weekKey][dayName].tasks.find(t => t.id === taskId);
+
+            if (!task) return;
+
+            taskItem.classList.add('editing');
+            taskText.innerHTML = `
+                <input type="text" class="task-edit-input" value="${task.text}" 
+                       onkeypress="handleEditKeyPress(event, '${dayName}', ${taskId}, '${weekKey}')"
+                       onblur="saveEditTask('${dayName}', ${taskId}, '${weekKey}')"
+                       onfocus="this.select()">
+            `;
+
+            const input = taskText.querySelector('.task-edit-input');
+            input.focus();
+        }
+
+        function saveEditTask(dayName, taskId, weekKey) {
+            const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
+            const input = taskItem.querySelector('.task-edit-input');
+            const newText = input.value.trim();
+
+            const task = weeklyData[weekKey][dayName].tasks.find(t => t.id === taskId);
+            if (task) {
+                if (newText) {
+                    task.text = newText;
+                }
+                renderTasks(dayName, weekKey);
+                optimizedSave();
+            }
+        }
+
+        function cancelEditTask(dayName, taskId, weekKey) {
+            renderTasks(dayName, weekKey);
+        }
+
+        function handleEditKeyPress(event, dayName, taskId, weekKey) {
+            if (event.key === 'Enter') {
+                event.target.blur(); // This will trigger onblur and save
+            } else if (event.key === 'Escape') {
+                cancelEditTask(dayName, taskId, weekKey);
+            }
+        }
+
+        // Drag and Drop functionality
+        let draggedTask = null;
+
+        function handleDragStart(event) {
+            draggedTask = {
+                id: parseInt(event.target.dataset.taskId),
+                day: event.target.dataset.day,
+                week: event.target.dataset.week
+            };
+            event.target.classList.add('dragging');
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDragEnter(event) {
+            event.preventDefault();
+
+            // Handle day card drag-over
+            const dayCard = event.target.closest('.day-card');
+            if (dayCard && dayCard !== draggedTask?.currentCard) {
+                // Remove drag-over from all other cards
+                document.querySelectorAll('.day-card').forEach(card => {
+                    if (card !== dayCard) card.classList.remove('drag-over');
+                });
+                dayCard.classList.add('drag-over');
+                draggedTask.currentCard = dayCard;
+            }
+
+            // Handle task item reordering
+            const taskItem = event.target.closest('.task-item');
+            if (taskItem && draggedTask) {
+                // Remove reorder-target from all other tasks
+                document.querySelectorAll('.task-item').forEach(item => {
+                    if (item !== taskItem) item.classList.remove('reorder-target');
+                });
+
+                // Only show reorder target if it's the same day/week
+                if (taskItem.dataset.day === draggedTask.day && taskItem.dataset.week === draggedTask.week) {
+                    taskItem.classList.add('reorder-target');
+                }
+            }
+        }
+
+        function handleDragLeave(event) {
+            // Only remove if we're leaving the card entirely, not just moving between elements inside it
+            const dayCard = event.target.closest('.day-card');
+            if (dayCard && !dayCard.contains(event.relatedTarget)) {
+                dayCard.classList.remove('drag-over');
+                if (draggedTask?.currentCard === dayCard) {
+                    draggedTask.currentCard = null;
+                }
+            }
+
+            // Handle task item reorder target cleanup
+            const taskItem = event.target.closest('.task-item');
+            if (taskItem && !taskItem.contains(event.relatedTarget)) {
+                taskItem.classList.remove('reorder-target');
+            }
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+
+            // Clean up all drag-over styling
+            document.querySelectorAll('.day-card').forEach(card => {
+                card.classList.remove('drag-over');
+            });
+
+            if (!draggedTask) return;
+
+            const targetDayCard = event.target.closest('.day-card');
+            if (!targetDayCard) return;
+
+            const targetDayName = targetDayCard.querySelector('.day-name').textContent;
+            const targetWeekKey = getCurrentWeekKey();
+
+            // Check if dropping on a task item for reordering
+            const targetTaskItem = event.target.closest('.task-item');
+            if (targetTaskItem && targetTaskItem.dataset.day === draggedTask.day && targetTaskItem.dataset.week === draggedTask.week) {
+                // Reordering within same card
+                const sourceTasks = weeklyData[draggedTask.week][draggedTask.day].tasks;
+                const taskIndex = sourceTasks.findIndex(t => t.id === draggedTask.id);
+                if (taskIndex === -1) return;
+
+                const [movedTask] = sourceTasks.splice(taskIndex, 1);
+
+                // Find target position
+                const targetTaskId = parseInt(targetTaskItem.dataset.taskId);
+                const targetIndex = sourceTasks.findIndex(t => t.id === targetTaskId);
+
+                // Insert at target position
+                if (targetIndex !== -1) {
+                    sourceTasks.splice(targetIndex, 0, movedTask);
+                } else {
+                    sourceTasks.push(movedTask);
+                }
+
+                renderTasks(draggedTask.day, draggedTask.week);
+                updateProgress();
+                optimizedSave();
+            } else {
+                // Moving between cards
+                const sourceWeekKey = draggedTask.week;
+                const sourceDayName = draggedTask.day;
+                const sourceTasks = weeklyData[sourceWeekKey][sourceDayName].tasks;
+                const taskIndex = sourceTasks.findIndex(t => t.id === draggedTask.id);
+
+                if (taskIndex === -1) return;
+
+                // Remove from source
+                const [movedTask] = sourceTasks.splice(taskIndex, 1);
+
+                // Add to target
+                if (!weeklyData[targetWeekKey][targetDayName]) {
+                    weeklyData[targetWeekKey][targetDayName] = { tasks: [] };
+                }
+                weeklyData[targetWeekKey][targetDayName].tasks.push(movedTask);
+
+                // Update both day displays
+                renderTasks(sourceDayName, sourceWeekKey);
+                renderTasks(targetDayName, targetWeekKey);
+                updateProgress();
+                optimizedSave();
+            }
+
+            // Clean up all dragging and reordering classes
+            document.querySelectorAll('.task-item').forEach(item => {
+                item.classList.remove('dragging', 'reorder-target');
+            });
+
+            // Reset dragged task
+            draggedTask = null;
         }
 
         function calculateStreak() {
@@ -940,6 +1417,7 @@
                 version: "1.0",
                 exportDate: new Date().toISOString(),
                 weekStartDay: weekStartDay,
+                isFocusView: isFocusView,
                 weeklyData: weeklyData,
                 metadata: {
                     totalWeeks: Object.keys(weeklyData).length,
@@ -992,12 +1470,15 @@
                         weeklyData = {};
                         weekStartDay = 1;
                         currentWeekOffset = 0;
+                        isFocusView = false;
 
                         // Clear localStorage
                         localStorage.removeItem('weeklyTrackerData');
 
                         // Reset UI
                         document.getElementById('weekStartDay').value = weekStartDay;
+                        document.getElementById('focusViewToggle').checked = false;
+                        updateViewLabel();
                         updateWeekDisplay();
                         generateDays();
                         updateProgress();
@@ -1045,6 +1526,13 @@
                         document.getElementById('weekStartDay').value = weekStartDay;
                     }
 
+                    // Update focus view if available
+                    if (importedData.isFocusView !== undefined) {
+                        isFocusView = importedData.isFocusView;
+                        document.getElementById('focusViewToggle').checked = isFocusView;
+                        updateViewLabel();
+                    }
+
                     // Refresh the display
                     generateDays();
                     updateProgress();
@@ -1081,6 +1569,7 @@
                 const dataToSave = {
                     weeklyData: weeklyData,
                     weekStartDay: weekStartDay,
+                    isFocusView: isFocusView,
                     lastSaved: new Date().toISOString()
                 };
                 localStorage.setItem('weeklyTrackerData', JSON.stringify(dataToSave));
@@ -1098,20 +1587,27 @@
                     const parsedData = JSON.parse(savedData);
                     weeklyData = parsedData.weeklyData || {};
                     weekStartDay = parsedData.weekStartDay || 1;
+                    isFocusView = parsedData.isFocusView || false;
 
-                    // Update UI with loaded week start preference
+                    // Update UI with loaded preferences
                     document.getElementById('weekStartDay').value = weekStartDay;
+
+                    // Update view toggle
+                    document.getElementById('focusViewToggle').checked = isFocusView;
+                    updateViewLabel();
 
                     console.log('✅ Data loaded from localStorage');
                 } else {
                     console.log('ℹ️ No saved data found, starting fresh');
                     weeklyData = {};
                     weekStartDay = 1;
+                    isFocusView = false;
                 }
             } catch (error) {
                 console.warn('❌ Failed to load from localStorage:', error);
                 weeklyData = {};
                 weekStartDay = 1;
+                isFocusView = false;
             }
         }
 
