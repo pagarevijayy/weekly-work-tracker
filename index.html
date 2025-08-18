@@ -987,6 +987,7 @@
         function createDayCard(dayName, config, weekKey) {
             const dayCard = document.createElement('div');
             dayCard.className = `day-card ${config.difficulty}`;
+            dayCard.setAttribute('data-day-name', dayName); // Add this for reliable day identification
             dayCard.ondragover = handleDragOver;
             dayCard.ondrop = handleDrop;
             dayCard.ondragenter = handleDragEnter;
@@ -1251,7 +1252,7 @@
             const targetDayCard = event.target.closest('.day-card');
             if (!targetDayCard) return;
 
-            const targetDayName = targetDayCard.querySelector('.day-name').textContent;
+            const targetDayName = targetDayCard.getAttribute('data-day-name');
             const targetWeekKey = getCurrentWeekKey();
 
             // Check if dropping on a task item for reordering
@@ -1278,7 +1279,7 @@
                 renderTasks(draggedTask.day, draggedTask.week);
                 updateProgress();
                 optimizedSave();
-            } else {
+            } else if (targetDayName) {
                 // Moving between cards
                 const sourceWeekKey = draggedTask.week;
                 const sourceDayName = draggedTask.day;
