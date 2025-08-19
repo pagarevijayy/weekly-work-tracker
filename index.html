@@ -7,8 +7,6 @@
     <title>Weekly Work Tracker</title>
     <meta name="keywords"
         content="weekly work tracker, productivity tracker, work planner, reflection tool, local-first, client-side">
-    <meta name="keywords"
-        content="weekly work tracker, productivity tracker, work planner, reflection tool, local-first, client-side">
     <meta property="og:title" content="Weekly Work Tracker">
     <meta property="og:description"
         content="A local-first, privacy-friendly weekly task tracker to plan and reflect on your work intensity.">
@@ -25,6 +23,7 @@
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
     </link>
     <style>
+        /* Existing CSS */
         * {
             margin: 0;
             padding: 0;
@@ -166,18 +165,6 @@
             /* Gentle Purple Tint */
             background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%) !important;
             border: 1px solid rgba(118, 75, 162, 0.2) !important;
-
-            /* Soft Blue Glow */
-            /* background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
-            border: 1px solid rgba(102, 126, 234, 0.2) !important; */
-
-            /* Warm Golden Highlight: */
-            /* background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-             border: 1px solid rgba(245, 158, 11, 0.2); */
-
-            /* Clean Mint Fresh: */
-            /* background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
-             border: 1px solid rgba(56, 161, 105, 0.2); */
         }
 
         .today-indicator {
@@ -233,14 +220,18 @@
             }
         }
 
-        .export-section {
+        .export-section,
+        .sync-section {
             text-align: center;
             margin-top: 20px;
             padding-top: 20px;
             border-top: 2px solid #e2e8f0;
         }
 
-        .export-btn {
+        .export-btn,
+        .import-btn,
+        .reset-btn,
+        .sync-btn {
             background: linear-gradient(135deg, #48bb78, #38a169);
             color: white;
             border: none;
@@ -253,45 +244,37 @@
             margin: 10px;
         }
 
-        .export-btn:hover {
+        .export-btn:hover,
+        .import-btn:hover,
+        .reset-btn:hover,
+        .sync-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
         }
 
         .import-btn {
             background: linear-gradient(135deg, #4299e1, #3182ce);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            margin: 10px;
         }
 
         .import-btn:hover {
-            transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(66, 153, 225, 0.4);
         }
 
         .reset-btn {
             background: linear-gradient(135deg, #e53e3e, #c53030);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            margin: 10px;
         }
 
         .reset-btn:hover {
-            transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(229, 62, 62, 0.4);
+        }
+
+        .sync-btn {
+            background: linear-gradient(135deg, #9F7AEA, #805AD5);
+            /* Purple gradient */
+        }
+
+        .sync-btn:hover {
+            box-shadow: 0 5px 15px rgba(159, 122, 234, 0.4);
         }
 
         .hidden-file-input {
@@ -771,6 +754,151 @@
             animation: pulse 2s infinite;
         }
 
+        /* New CSS for WebRTC Sync */
+        .sync-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .sync-section h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .sync-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .sync-status {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .sync-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9em;
+            resize: vertical;
+            margin-top: 10px;
+        }
+
+        .sync-action-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ebf8ff;
+            border-radius: 10px;
+            background: #f7fafc;
+        }
+
+        .sync-action-group h4 {
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+
+        .sync-action-group button {
+            margin-bottom: 10px;
+        }
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1000;
+            /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.6);
+            /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+        }
+
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+
+        .modal p {
+            margin-bottom: 15px;
+            color: #4a5568;
+        }
+
+        .modal button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal button:hover {
+            background: #5a67d8;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+
         @media (max-width: 768px) {
             .days-grid {
                 grid-template-columns: 1fr;
@@ -805,6 +933,10 @@
                 flex-direction: column;
                 gap: 15px;
             }
+
+            .sync-controls {
+                flex-direction: column;
+            }
         }
     </style>
     <script>
@@ -812,7 +944,7 @@
             (window.vaq = window.vaq || []).push(arguments);
         };
     </script>
-    <script defer src="/_vercel/insights/script.js"></script>
+    <script src="/_vercel/insights/script.js"></script>
 </head>
 
 <body>
@@ -894,9 +1026,38 @@
                 <button class="export-btn" onclick="exportData()">📊 Export Data (JSON)</button>
                 <button class="import-btn" onclick="document.getElementById('fileInput').click()">📥 Import
                     Data</button>
-                <button class="reset-btn" onclick="resetAllData()">🗑️ Reset All Data</button>
+                <button class="reset-btn" onclick="showResetConfirmation()">🗑️ Reset All Data</button>
                 <input type="file" id="fileInput" class="hidden-file-input" accept=".json" onchange="importData(event)">
             </div>
+
+            <!-- New Sync Section -->
+            <div class="sync-section">
+                <h3 style="color: #2d3748; margin-bottom: 15px;">🔗 Sync Devices (P2P)</h3>
+                <div class="sync-controls">
+                    <div class="sync-action-group">
+                        <h4>Create Session</h4>
+                        <button class="sync-btn" onclick="createOffer()">Generate Offer Code</button>
+                        <textarea id="offerCode" class="sync-textarea" placeholder="Offer Code will appear here..."
+                            readonly></textarea>
+                        <button class="sync-btn" onclick="copyCode('offerCode')">Copy Offer Code</button>
+                        <button class="sync-btn" onclick="pasteAnswer()">Paste Answer Code</button>
+                        <textarea id="answerInput" class="sync-textarea" placeholder="Paste Answer Code here..."
+                            oninput="autoProcessAnswer()"></textarea>
+                    </div>
+                    <div class="sync-action-group">
+                        <h4>Join Session</h4>
+                        <textarea id="offerInput" class="sync-textarea" placeholder="Paste Offer Code here..."
+                            oninput="autoProcessOffer()"></textarea>
+                        <button class="sync-btn" onclick="processOffer()">Generate Answer Code</button>
+                        <textarea id="answerCode" class="sync-textarea" placeholder="Answer Code will appear here..."
+                            readonly></textarea>
+                        <button class="sync-btn" onclick="copyCode('answerCode')">Copy Answer Code</button>
+                    </div>
+                </div>
+                <p class="sync-status" id="syncStatus">Status: Not connected</p>
+            </div>
+            <!-- End New Sync Section -->
+
         </div>
     </div>
 
@@ -917,6 +1078,18 @@
         </div>
     </div>
 
+    <!-- Custom Modal for Confirmation/Alerts -->
+    <div id="customModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <p id="modalMessage"></p>
+            <div class="modal-buttons" id="modalButtons">
+                <!-- Buttons will be injected here -->
+            </div>
+        </div>
+    </div>
+
     <script>
         let dailyData = {};
         let currentWeekOffset = 0;
@@ -925,6 +1098,21 @@
 
         let saveTimeout = null;
         let autoSaveInterval = null;
+
+        // WebRTC variables
+        let peerConnection = null;
+        let dataChannel = null;
+        let isOfferer = false; // To distinguish between the initiator and receiver
+        let syncStatusElement = null;
+
+        // STUN servers for NAT traversal (no backend needed, just public servers)
+        const iceServers = [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' },
+            { urls: 'stun:stun3.l.google.com:19302' },
+            { urls: 'stun:stun4.l.google.com:19302' }
+        ];
 
         const dayConfigs = {
             'Monday': { difficulty: 'hard', description: 'DSA & Core SWE Learning' },
@@ -946,6 +1134,330 @@
             "Champions are made in the daily grind! 🏆",
             "Discipline is choosing between what you want now and what you want most! 💎"
         ];
+
+        // --- Custom Modal Functions (replaces alert/confirm) ---
+        function showModal(title, message, buttons) {
+            const modal = document.getElementById('customModal');
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            const modalButtons = document.getElementById('modalButtons');
+            modalButtons.innerHTML = '';
+
+            buttons.forEach(btnConfig => {
+                const button = document.createElement('button');
+                button.textContent = btnConfig.text;
+                button.onclick = () => {
+                    closeModal();
+                    if (btnConfig.handler) {
+                        btnConfig.handler();
+                    }
+                };
+                modalButtons.appendChild(button);
+            });
+
+            modal.style.display = 'flex'; // Use flex to center content
+        }
+
+        function closeModal() {
+            document.getElementById('customModal').style.display = 'none';
+        }
+
+        function showAlert(message, title = 'Notification') {
+            showModal(title, message, [{ text: 'OK' }]);
+        }
+
+        function showConfirmation(message, onConfirm, onCancel, title = 'Confirmation') {
+            showModal(title, message, [
+                { text: 'Cancel', handler: onCancel },
+                { text: 'OK', handler: onConfirm }
+            ]);
+        }
+
+        // --- WebRTC Sync Logic ---
+
+        function initializePeerConnection(isCreator) {
+            // Close any existing connection
+            if (peerConnection) {
+                peerConnection.close();
+                dataChannel = null;
+            }
+
+            isOfferer = isCreator;
+            peerConnection = new RTCPeerConnection({ iceServers: iceServers });
+            updateSyncStatus('Initializing...');
+
+            // Handle ICE candidates: these are network details to exchange
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    // Send this candidate to the other peer via signaling (manual copy/paste for now)
+                    console.log('New ICE candidate:', event.candidate);
+                    // No need to display individual candidates for manual signaling,
+                    // they are bundled into the SDP offer/answer.
+                } else {
+                    console.log('All ICE candidates gathered.');
+                    // When all ICE candidates are gathered, the local description is complete.
+                    // This is the point to display the SDP offer/answer.
+                    if (peerConnection.localDescription) {
+                        if (isOfferer) {
+                            document.getElementById('offerCode').value = btoa(JSON.stringify(peerConnection.localDescription));
+                            updateSyncStatus('Offer code generated. Share it with the other device.');
+                        } else {
+                            document.getElementById('answerCode').value = btoa(JSON.stringify(peerConnection.localDescription));
+                            updateSyncStatus('Answer code generated. Paste it back to the first device.');
+                        }
+                    }
+                }
+            };
+
+            // Handle ICE connection state changes
+            peerConnection.oniceconnectionstatechange = (event) => {
+                console.log('ICE connection state:', peerConnection.iceConnectionState);
+                if (peerConnection.iceConnectionState === 'connected') {
+                    updateSyncStatus('Connected! Syncing data...');
+                } else if (peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') {
+                    updateSyncStatus('Disconnected or failed. Please try again.');
+                    showAlert('Sync connection lost or failed. Please try re-creating/joining a session.', 'Sync Error');
+                } else if (peerConnection.iceConnectionState === 'closed') {
+                    updateSyncStatus('Connection closed.');
+                }
+            };
+
+            // Handle data channel creation (for the offerer)
+            if (isOfferer) {
+                dataChannel = peerConnection.createDataChannel("dataChannel");
+                setupDataChannel(dataChannel);
+            } else {
+                // Handle data channel received (for the answerer)
+                peerConnection.ondatachannel = (event) => {
+                    dataChannel = event.channel;
+                    setupDataChannel(dataChannel);
+                };
+            }
+        }
+
+        function setupDataChannel(channel) {
+            dataChannel = channel; // Ensure global dataChannel is set
+            dataChannel.onopen = () => {
+                console.log("Data channel is open!");
+                updateSyncStatus('Connection established! Syncing data...');
+                // Send full data immediately upon connection
+                sendDailyDataToPeers(true);
+            };
+            dataChannel.onmessage = (event) => {
+                console.log("Message from peer:", event.data);
+                try {
+                    const receivedData = JSON.parse(event.data);
+                    if (receivedData.type === 'FULL_SYNC' && receivedData.data) {
+                        mergeDailyData(receivedData.data);
+                        updateProgress(); // Re-render UI after merge
+                        optimizedSave(); // Save merged data locally
+                    }
+                } catch (e) {
+                    console.error("Error parsing received data:", e);
+                }
+            };
+            dataChannel.onclose = () => {
+                console.log("Data channel closed.");
+                updateSyncStatus('Disconnected.');
+            };
+            dataChannel.onerror = (error) => {
+                console.error("Data channel error:", error);
+                updateSyncStatus('Error during sync.');
+                showAlert('An error occurred during sync: ' + error.message, 'Sync Error');
+            };
+        }
+
+        function updateSyncStatus(message) {
+            if (!syncStatusElement) {
+                syncStatusElement = document.getElementById('syncStatus');
+            }
+            syncStatusElement.textContent = `Status: ${message}`;
+        }
+
+        // --- Offerer functions ---
+        async function createOffer() {
+            updateSyncStatus('Creating session...');
+            initializePeerConnection(true); // This device is the offerer
+
+            try {
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+                // The onicecandidate event listener will populate the offerCode textarea
+            } catch (error) {
+                console.error("Error creating offer:", error);
+                updateSyncStatus('Error creating offer.');
+                showAlert('Failed to create offer: ' + error.message, 'Sync Error');
+            }
+        }
+
+        // --- Answerer functions ---
+        async function processOffer() {
+            const offerInput = document.getElementById('offerInput');
+            const offerCode = offerInput.value.trim();
+
+            if (!offerCode) {
+                showAlert('Please paste an Offer Code to join a session.', 'Input Required');
+                return;
+            }
+
+            updateSyncStatus('Processing offer...');
+            initializePeerConnection(false); // This device is the answerer
+
+            try {
+                const decodedOffer = JSON.parse(atob(offerCode));
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(decodedOffer));
+
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                // The onicecandidate event listener will populate the answerCode textarea
+            } catch (error) {
+                console.error("Error processing offer:", error);
+                updateSyncStatus('Error processing offer.');
+                showAlert('Failed to process offer. Make sure the code is valid.', 'Sync Error');
+            }
+        }
+
+        // --- Finalize connection (offerer pastes answer) ---
+        async function pasteAnswer() {
+            const answerInput = document.getElementById('answerInput');
+            const answerCode = answerInput.value.trim();
+
+            if (!answerCode) {
+                showAlert('Please paste the Answer Code to complete the connection.', 'Input Required');
+                return;
+            }
+
+            if (!peerConnection || !isOfferer) {
+                showAlert('Please create an offer first before pasting an answer.', 'Sync Error');
+                return;
+            }
+
+            updateSyncStatus('Finalizing connection...');
+            try {
+                const decodedAnswer = JSON.parse(atob(answerCode));
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(decodedAnswer));
+                updateSyncStatus('Connection complete! Waiting for data channel to open.');
+                answerInput.value = ''; // Clear answer input
+            } catch (error) {
+                console.error("Error setting remote description with answer:", error);
+                updateSyncStatus('Error finalizing connection.');
+                showAlert('Failed to finalize connection. Make sure the code is valid.', 'Sync Error');
+            }
+        }
+
+        function autoProcessOffer() {
+            const offerInput = document.getElementById('offerInput');
+            // Check if it looks like a valid Base64 string that could be an SDP
+            if (offerInput.value.length > 50 && !peerConnection) { // Simple heuristic
+                processOffer();
+            }
+        }
+
+        function autoProcessAnswer() {
+            const answerInput = document.getElementById('answerInput');
+            // Check if it looks like a valid Base64 string that could be an SDP
+            if (answerInput.value.length > 50 && peerConnection && isOfferer) { // Simple heuristic
+                pasteAnswer();
+            }
+        }
+
+
+        // --- Data Syncing and Merging ---
+
+        function sendDailyDataToPeers(force = false) {
+            // Only send if data channel is open and not currently receiving a full sync
+            if (dataChannel && dataChannel.readyState === 'open') {
+                try {
+                    const dataToSend = JSON.stringify({
+                        type: 'FULL_SYNC',
+                        data: dailyData,
+                        lastModified: new Date().toISOString() // Add a timestamp for LWW
+                    });
+                    dataChannel.send(dataToSend);
+                    console.log('Sent data to peer.');
+                } catch (e) {
+                    console.error('Failed to send data over data channel:', e);
+                    // This error is expected if the channel closes mid-send, or is not ready
+                }
+            }
+        }
+
+        function mergeDailyData(incomingDailyData) {
+            console.log('Merging incoming data:', incomingDailyData);
+            const currentDailyData = dailyData;
+
+            let hasChanged = false;
+
+            // Iterate over incoming data
+            for (const dateKey in incomingDailyData) {
+                const incomingDay = incomingDailyData[dateKey];
+                const localDay = currentDailyData[dateKey];
+
+                if (!localDay) {
+                    // Day doesn't exist locally, add it
+                    currentDailyData[dateKey] = incomingDay;
+                    hasChanged = true;
+                } else {
+                    // Day exists in both, merge tasks
+                    const mergedTasks = [];
+                    const incomingTasks = incomingDay.tasks || [];
+                    const localTasks = localDay.tasks || [];
+
+                    // Create a map for quick lookup of tasks by ID in both sets
+                    const allTasksMap = new Map();
+
+                    // Add local tasks to map
+                    localTasks.forEach(task => {
+                        allTasksMap.set(task.id, task);
+                    });
+
+                    // Add incoming tasks, applying last-write-wins based on createdAt
+                    incomingTasks.forEach(incomingTask => {
+                        const existingTask = allTasksMap.get(incomingTask.id);
+                        if (!existingTask || new Date(incomingTask.createdAt) > new Date(existingTask.createdAt)) {
+                            allTasksMap.set(incomingTask.id, incomingTask);
+                            hasChanged = true; // Mark as changed if incoming is new or newer
+                        }
+                    });
+
+                    // Handle tasks that might have been deleted on the incoming side
+                    // If a task exists locally but not in incoming, and it's an older timestamp, it means it might have been deleted remotely.
+                    // For now, a simpler LWW on the task level is sufficient; explicit deletion tracking is more complex.
+                    // This simple merge will keep tasks if they exist in either. If a task is truly deleted remotely,
+                    // and then a full sync happens, it might reappear if this side didn't also delete it.
+                    // For now, the current implementation handles "add" and "update" and relies on the fact that
+                    // if a task is completely gone from `incomingDailyData` for a given `dateKey`, it won't be re-added from incoming.
+                    // However, if a task was deleted locally and it still exists remotely with a newer timestamp, it will be brought back.
+                    // This is acceptable for a "last-write-wins" on task creation/modification.
+
+                    // Convert map back to array
+                    currentDailyData[dateKey].tasks = Array.from(allTasksMap.values()).sort((a, b) => a.createdAt.localeCompare(b.createdAt)); // Keep consistent order
+                    if (JSON.stringify(localTasks) !== JSON.stringify(currentDailyData[dateKey].tasks)) {
+                        hasChanged = true;
+                    }
+                }
+            }
+
+            // Also check for days that exist locally but not in incoming (implies remote deletion of an entire day's tasks)
+            // This case is tricky with simple LWW. For simplicity, we assume incoming only *adds* or *updates* data for now.
+            // If a day is completely removed from remote, it won't remove it from local unless we iterate `currentDailyData`
+            // and remove keys not present in `incomingDailyData`, but this could lead to unintended data loss if
+            // one device hasn't synced for a while and has older, but still valid, local days.
+            // The safest approach for now is to only add/update, and let users manually clear old data if necessary,
+            // or implement more complex tombstone/conflict resolution.
+
+            if (hasChanged) {
+                // Ensure UI reflects merged data
+                generateDays(); // Regenerate all day cards to reflect changes
+                updateProgress(); // Update progress bar
+                optimizedSave(); // Save merged data to localStorage
+                showAlert('Data synced successfully!', 'Sync Complete');
+            } else {
+                console.log('No significant changes after merge.');
+            }
+        }
+
+        // --- Original App Functions (with modifications for sync) ---
 
         function createConfetti() {
             const colors = ['#667eea', '#764ba2', '#48bb78', '#4299e1', '#e53e3e', '#dd6b20', '#38a169', '#3182ce'];
@@ -1195,7 +1707,7 @@
                     id: Date.now(),
                     text: taskText,
                     completed: false,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString() // Add createdAt for LWW
                 };
 
                 dailyData[dateKey].tasks.push(task);
@@ -1203,6 +1715,7 @@
                 renderTasks(dateKey);
                 updateProgress();
                 optimizedSave();
+                sendDailyDataToPeers(); // Send update after adding task
             }
         }
 
@@ -1236,18 +1749,22 @@
             const task = tasks.find(t => t.id === taskId);
             if (task) {
                 task.completed = !task.completed;
+                task.createdAt = new Date().toISOString(); // Update timestamp on modification
                 renderTasks(dateKey);
                 updateProgress();
                 checkAllTasksCompleted(); // Check for confetti
                 optimizedSave();
+                sendDailyDataToPeers(); // Send update after toggling task
             }
         }
 
         function deleteTask(dateKey, taskId) {
             dailyData[dateKey].tasks = dailyData[dateKey].tasks.filter(t => t.id !== taskId);
+            // No need to update createdAt for deletion, as it's a removal
             renderTasks(dateKey);
             updateProgress();
             optimizedSave();
+            sendDailyDataToPeers(); // Send update after deleting task
         }
 
         function startEditTask(dateKey, taskId) {
@@ -1276,11 +1793,13 @@
 
             const task = dailyData[dateKey].tasks.find(t => t.id === taskId);
             if (task) {
-                if (newText) {
+                if (newText && task.text !== newText) {
                     task.text = newText;
+                    task.createdAt = new Date().toISOString(); // Update timestamp on modification
+                    optimizedSave();
+                    sendDailyDataToPeers(); // Send update after editing task
                 }
                 renderTasks(dateKey);
-                optimizedSave();
             }
         }
 
@@ -1375,46 +1894,41 @@
             const targetDateKey = targetDayCard.getAttribute('data-date-key');
             if (!targetDateKey) return;
 
-            const targetTaskItem = event.target.closest('.task-item');
-            if (targetTaskItem && targetTaskItem.dataset.dateKey === draggedTask.dateKey) {
-                const sourceTasks = dailyData[draggedTask.dateKey].tasks;
-                const taskIndex = sourceTasks.findIndex(t => t.id === draggedTask.id);
-                if (taskIndex === -1) return;
+            const sourceDateKey = draggedTask.dateKey;
+            const sourceTasks = dailyData[sourceDateKey].tasks;
+            const taskIndex = sourceTasks.findIndex(t => t.id === draggedTask.id);
 
-                const [movedTask] = sourceTasks.splice(taskIndex, 1);
+            if (taskIndex === -1) return;
 
-                const targetTaskId = parseInt(targetTaskItem.dataset.taskId);
-                const targetIndex = sourceTasks.findIndex(t => t.id === targetTaskId);
+            const [movedTask] = sourceTasks.splice(taskIndex, 1);
+            movedTask.createdAt = new Date().toISOString(); // Mark as modified
 
-                if (targetIndex !== -1) {
-                    sourceTasks.splice(targetIndex, 0, movedTask);
-                } else {
-                    sourceTasks.push(movedTask);
-                }
-
-                renderTasks(draggedTask.dateKey);
-                updateProgress();
-                optimizedSave();
-            } else {
-                const sourceDateKey = draggedTask.dateKey;
-                const sourceTasks = dailyData[sourceDateKey].tasks;
-                const taskIndex = sourceTasks.findIndex(t => t.id === draggedTask.id);
-
-                if (taskIndex === -1) return;
-
-                const [movedTask] = sourceTasks.splice(taskIndex, 1);
-
-                if (!dailyData[targetDateKey]) {
-                    dailyData[targetDateKey] = { tasks: [] };
-                }
-                dailyData[targetDateKey].tasks.push(movedTask);
-
-                renderTasks(sourceDateKey);
-                renderTasks(targetDateKey);
-                updateProgress();
-                optimizedSave();
+            if (!dailyData[targetDateKey]) {
+                dailyData[targetDateKey] = { tasks: [] };
             }
 
+            const targetTaskItem = event.target.closest('.task-item');
+
+            if (targetDateKey === sourceDateKey && targetTaskItem) {
+                // Reorder within the same day
+                const targetTaskId = parseInt(targetTaskItem.dataset.taskId);
+                const targetIndex = dailyData[targetDateKey].tasks.findIndex(t => t.id === targetTaskId);
+                if (targetIndex !== -1) {
+                    dailyData[targetDateKey].tasks.splice(targetIndex, 0, movedTask);
+                } else {
+                    dailyData[targetDateKey].tasks.push(movedTask);
+                }
+            } else {
+                // Move to a different day or append to end of list if no specific target task
+                dailyData[targetDateKey].tasks.push(movedTask);
+            }
+
+
+            renderTasks(sourceDateKey);
+            renderTasks(targetDateKey);
+            updateProgress();
+            optimizedSave();
+            sendDailyDataToPeers(); // Send update after drag/drop
             draggedTask = null;
         }
 
@@ -1496,7 +2010,7 @@
             const originalText = exportButton.textContent;
 
             const exportData = {
-                version: "2.0",
+                version: "2.1", // Updated version for WebRTC integration
                 exportDate: new Date().toISOString(),
                 weekStartDay: weekStartDay,
                 isFocusView: isFocusView,
@@ -1526,49 +2040,50 @@
             }, 2000);
         }
 
-        function resetAllData() {
-            const confirmation = confirm(
+        function showResetConfirmation() {
+            showConfirmation(
                 '⚠️ WARNING: This will permanently delete ALL your data!\n\n' +
                 'This includes:\n' +
                 '• All tasks from all dates\n' +
                 '• Your progress history\n' +
                 '• Week start preferences\n\n' +
                 'This action cannot be undone.\n\n' +
-                'Are you absolutely sure you want to reset everything?'
+                'Are you absolutely sure you want to reset everything?',
+                () => { // onConfirm
+                    showConfirmation(
+                        '🚨 FINAL WARNING!\n\n' +
+                        'You are about to lose ALL your data permanently.\n\n' +
+                        'Click OK to proceed with the reset, or Cancel to keep your data.',
+                        () => { // onConfirm final
+                            try {
+                                dailyData = {};
+                                weekStartDay = 1;
+                                currentWeekOffset = 0;
+                                isFocusView = false;
+
+                                localStorage.removeItem('weeklyTrackerData');
+
+                                document.getElementById('weekStartDay').value = weekStartDay;
+                                document.getElementById('focusViewToggle').checked = false;
+                                updateViewLabel();
+                                updateWeekDisplay();
+                                generateDays();
+                                updateProgress();
+
+                                showAlert('✅ All data has been reset successfully!\n\nYou can start fresh with your weekly tracking.', 'Data Reset');
+
+                            } catch (error) {
+                                showAlert('❌ Error resetting data: ' + error.message, 'Reset Error');
+                                console.error('Reset error:', error);
+                            }
+                        },
+                        () => { } // onCancel final
+                    );
+                },
+                () => { } // onCancel
             );
-
-            if (confirmation) {
-                const finalConfirmation = confirm(
-                    '🚨 FINAL WARNING!\n\n' +
-                    'You are about to lose ALL your data permanently.\n\n' +
-                    'Click OK to proceed with the reset, or Cancel to keep your data.'
-                );
-
-                if (finalConfirmation) {
-                    try {
-                        dailyData = {};
-                        weekStartDay = 1;
-                        currentWeekOffset = 0;
-                        isFocusView = false;
-
-                        localStorage.removeItem('weeklyTrackerData');
-
-                        document.getElementById('weekStartDay').value = weekStartDay;
-                        document.getElementById('focusViewToggle').checked = false;
-                        updateViewLabel();
-                        updateWeekDisplay();
-                        generateDays();
-                        updateProgress();
-
-                        alert('✅ All data has been reset successfully!\n\nYou can start fresh with your weekly tracking.');
-
-                    } catch (error) {
-                        alert('❌ Error resetting data: ' + error.message);
-                        console.error('Reset error:', error);
-                    }
-                }
-            }
         }
+
 
         function importData(event) {
             const file = event.target.files[0];
@@ -1603,44 +2118,44 @@
                         throw new Error('Invalid data format - no dailyData or weeklyData found');
                     }
 
-                    const shouldMerge = confirm('Do you want to merge with existing data? Click "OK" to merge, or "Cancel" to replace all data.');
-
-                    if (shouldMerge) {
-                        Object.keys(dataToImport).forEach(dateKey => {
-                            dailyData[dateKey] = dataToImport[dateKey];
-                        });
-                    } else {
-                        dailyData = dataToImport;
-                    }
-
-                    if (importedData.weekStartDay !== undefined) {
-                        weekStartDay = importedData.weekStartDay;
-                        document.getElementById('weekStartDay').value = weekStartDay;
-                    }
-
-                    if (importedData.isFocusView !== undefined) {
-                        isFocusView = importedData.isFocusView;
-                        document.getElementById('focusViewToggle').checked = isFocusView;
-                        updateViewLabel();
-                    }
-
-                    generateDays();
-                    updateProgress();
-                    optimizedSave();
-
-                    const totalDays = Object.keys(dataToImport).length;
-                    const totalTasks = Object.values(dataToImport).reduce((total, day) => {
-                        return total + (day.tasks ? day.tasks.length : 0);
-                    }, 0);
-
-                    alert(`✅ Data imported successfully!\n\nDays imported: ${totalDays}\nTotal tasks: ${totalTasks}`);
+                    showConfirmation('Do you want to merge with existing data? Click "OK" to merge, or "Cancel" to replace all data.',
+                        () => { // On Confirm (merge)
+                            mergeDailyData(dataToImport); // Use the dedicated merge function
+                            const totalDays = Object.keys(dataToImport).length;
+                            const totalTasks = Object.values(dataToImport).reduce((total, day) => {
+                                return total + (day.tasks ? day.tasks.length : 0);
+                            }, 0);
+                            showAlert(`✅ Data merged successfully!\n\nDays imported: ${totalDays}\nTotal tasks: ${totalTasks}`, 'Import Complete');
+                        },
+                        () => { // On Cancel (replace)
+                            dailyData = dataToImport;
+                            if (importedData.weekStartDay !== undefined) {
+                                weekStartDay = importedData.weekStartDay;
+                                document.getElementById('weekStartDay').value = weekStartDay;
+                            }
+                            if (importedData.isFocusView !== undefined) {
+                                isFocusView = importedData.isFocusView;
+                                document.getElementById('focusViewToggle').checked = isFocusView;
+                                updateViewLabel();
+                            }
+                            generateDays();
+                            updateProgress();
+                            optimizedSave();
+                            const totalDays = Object.keys(dataToImport).length;
+                            const totalTasks = Object.values(dataToImport).reduce((total, day) => {
+                                return total + (day.tasks ? day.tasks.length : 0);
+                            }, 0);
+                            showAlert(`✅ Data replaced successfully!\n\nDays imported: ${totalDays}\nTotal tasks: ${totalTasks}`, 'Import Complete');
+                        },
+                        'Import Options'
+                    );
 
                 } catch (error) {
-                    alert('❌ Error importing data: ' + error.message + '\n\nPlease make sure you selected a valid JSON file exported from this app.');
+                    showAlert('❌ Error importing data: ' + error.message + '\n\nPlease make sure you selected a valid JSON file exported from this app.', 'Import Error');
                     console.error('Import error:', error);
                 }
 
-                event.target.value = '';
+                event.target.value = ''; // Clear file input
             };
 
             reader.readAsText(file);
@@ -1697,7 +2212,7 @@
                             });
                         });
 
-                        saveData();
+                        saveData(); // Save in new format
                     } else {
                         dailyData = {};
                     }
@@ -1728,7 +2243,7 @@
             if (autoSaveInterval) {
                 clearInterval(autoSaveInterval);
             }
-            autoSaveInterval = setInterval(saveData, 120000);
+            autoSaveInterval = setInterval(saveData, 120000); // Save every 2 minutes
         }
 
         function cleanupTimers() {
@@ -1742,7 +2257,15 @@
             }
         }
 
+        function copyCode(elementId) {
+            const textarea = document.getElementById(elementId);
+            textarea.select();
+            document.execCommand('copy');
+            showAlert('Code copied to clipboard!', 'Copied!');
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
+            syncStatusElement = document.getElementById('syncStatus'); // Initialize sync status element
             loadData();
             updateWeekDisplay();
             generateDays();
@@ -1753,6 +2276,9 @@
             window.addEventListener('beforeunload', function () {
                 cleanupTimers();
                 saveData();
+                if (peerConnection) {
+                    peerConnection.close(); // Close WebRTC connection on unload
+                }
             });
 
             document.addEventListener('visibilitychange', function () {
