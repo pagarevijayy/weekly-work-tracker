@@ -500,7 +500,7 @@
 
         .view-toggle {
             position: absolute;
-            top: 0;
+            top: 60px;
             right: 0;
             display: flex;
             align-items: center;
@@ -987,8 +987,16 @@
             }
 
             .header h1 {
-                font-size: 2em;
-                margin: 1em 0;
+                font-size: 1.5em;
+                margin: 0.75em 0;
+            }
+
+            .header .header-emoji {
+                display: none;
+            }
+
+            .header .header-description {
+                font-size: 12px;
             }
 
             .header-content {
@@ -1000,6 +1008,10 @@
                 position: static;
                 justify-content: center;
                 margin-top: 10px;
+            }
+
+            .view-toggle .switch {
+                zoom: 0.6;
             }
 
             body {
@@ -1248,8 +1260,8 @@
         <div class="header">
             <div class="header-content">
                 <div class="header-text">
-                    <h1>🚀 Weekly Work Tracker</h1>
-                    <p>Stay consistent, track progress, achieve your goals!</p>
+                    <h1><span class="header-emoji">🚀</span> Weekly Work Tracker</h1>
+                    <p class="header-description">Stay consistent, track progress, achieve your goals!</p>
                 </div>
                 <div class="view-toggle">
                     <label class="switch">
@@ -1320,8 +1332,8 @@
             <div class="export-section">
                 <h3 style="color: #2d3748; margin-bottom: 15px;">📄 Data Management</h3>
                 <button class="export-btn" onclick="exportData()">📊 Export Data (JSON)</button>
-                <button class="import-btn" onclick="document.getElementById('fileInput').click()">📥 Import
-                    Data</button>
+                <button class="import-btn" onclick="document.getElementById('fileInput').click()">📥 Import Data
+                    (JSON)</button>
                 <button class="reset-btn" onclick="showResetConfirmation()">🗑️ Reset All Data</button>
                 <input type="file" id="fileInput" class="hidden-file-input" accept=".json" onchange="importData(event)">
             </div>
@@ -1335,13 +1347,13 @@
                 </div>
 
                 <div id="createSessionState" style="display: none;">
-                    <h4>1. Share this Code to Send Your Data:</h4>
+                    <h4>1. Share this code to send your data:</h4>
                     <textarea id="offerCode" class="sync-textarea" placeholder="Generating data sharing code..."
                         readonly></textarea>
                     <button class="sync-copy-btn" onclick="copyCode('offerCode')">Copy Data Code</button>
-                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">2. Waiting for Confirmation
-                        Code from the other device...</p>
-                    <h4>3. Paste Confirmation Code to Finalize Sharing:</h4>
+                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">2. Waiting for confirmation
+                        code from the other device...</p>
+                    <h4>3. Paste confirmation code to finalize sharing:</h4>
                     <textarea id="answerInput" class="sync-textarea" placeholder="Paste Confirmation Code here..."
                         oninput="autoProcessAnswer()"></textarea>
                     <button class="sync-btn" onclick="pasteAnswer()">Finalize Data Sharing</button>
@@ -1349,16 +1361,16 @@
                 </div>
 
                 <div id="joinSessionState" style="display: none;">
-                    <h4>1. Paste the Code to Receive Data:</h4>
+                    <h4>1. Paste the code to receive data:</h4>
                     <textarea id="offerInput" class="sync-textarea" placeholder="Paste Data Sharing Code here..."
                         oninput="autoProcessOffer()"></textarea>
                     <button style="margin-bottom: 20px;" class="sync-btn" onclick="processOffer()">Generate
                         Confirmation Code</button>
-                    <h4>2. Your Confirmation Code:</h4>
+                    <h4>2. Your confirmation code:</h4>
                     <textarea id="answerCode" class="sync-textarea" placeholder="Generating confirmation code..."
                         readonly></textarea>
                     <button class="sync-copy-btn" onclick="copyCode('answerCode')">Copy Confirmation Code</button>
-                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">3. Share this Confirmation Code
+                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">3. Share this confirmation code
                         back with the sender.</p>
                     <button class="reset-btn" onclick="cancelSync()">Cancel</button>
                 </div>
@@ -2611,18 +2623,10 @@
 
         function showResetConfirmation() {
             showConfirmation(
-                '⚠️ WARNING: This will permanently delete ALL your data!\n\n' +
-                'This includes:\n' +
-                '• All tasks from all dates\n' +
-                '• Your progress history\n' +
-                '• Week start preferences\n\n' +
-                'This action cannot be undone.\n\n' +
-                'Are you absolutely sure you want to reset everything?',
+                "⚠️ Warning: This will permanently erase all tasks, history, and preferences. This action cannot be undone—are you sure you want to continue?",
                 () => { // onConfirm
                     showConfirmation(
-                        '🚨 FINAL WARNING!\n\n' +
-                        'You are about to lose ALL your data permanently.\n\n' +
-                        'Click OK to proceed with the reset, or Cancel to keep your data.',
+                        "🚨 Final Warning: Proceeding will permanently erase all your data. Click OK to reset everything, or Cancel to keep your data.",
                         () => { // onConfirm final
                             try {
                                 dailyData = { _lastModified: new Date().toISOString() }; // Reset with new timestamp
