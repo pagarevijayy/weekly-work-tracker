@@ -1328,41 +1328,39 @@
 
             <!-- New Sync Section -->
             <div class="sync-section">
-                <h3 style="color: #2d3748; margin-bottom: 15px;">🔗 Sync Devices (P2P)</h3>
+                <h3 style="color: #2d3748; margin-bottom: 15px;">🔗 Sync Data (P2P)</h3>
                 <div id="syncInitialState">
-                    <button class="sync-btn" onclick="showCreateSession()">Create New Sync Session</button>
-                    <button class="sync-btn" onclick="showJoinSession()">Join Existing Sync Session</button>
+                    <button class="sync-btn" onclick="showCreateSession()">Generate Import Code</button>
+                    <button class="sync-btn" onclick="showJoinSession()">Paste Import Code</button>
                 </div>
 
                 <div id="createSessionState" style="display: none;">
-                    <h4>1. Share this Offer Code:</h4>
-                    <textarea id="offerCode" class="sync-textarea" placeholder="Generating offer code..."
+                    <h4>1. Share this Import Code:</h4>
+                    <textarea id="offerCode" class="sync-textarea" placeholder="Generating import code..."
                         readonly></textarea>
                     <button class="sync-copy-btn" onclick="copyCode('offerCode')">Copy Code</button>
-                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">2. Waiting for Answer Code from
-                        the other device...</p>
-                    <h4>3. Paste Answer Code to connect:</h4>
-                    <textarea id="answerInput" class="sync-textarea" placeholder="Paste Answer Code here..."
+                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">2. Waiting for Confirmation
+                        Code from the other device...</p>
+                    <h4>3. Paste Confirmation Code to finalize:</h4>
+                    <textarea id="answerInput" class="sync-textarea" placeholder="Paste Confirmation Code here..."
                         oninput="autoProcessAnswer()"></textarea>
-                    <button class="sync-btn" onclick="pasteAnswer()">Finalize Connection</button>
-                    <!-- Explicit button added -->
-                    <button class="reset-btn" onclick="cancelSync()">Cancel Session</button>
+                    <button class="sync-btn" onclick="pasteAnswer()">Finalize Import</button>
+                    <button class="reset-btn" onclick="cancelSync()">Cancel</button>
                 </div>
 
                 <div id="joinSessionState" style="display: none;">
-                    <h4>1. Paste Offer Code here:</h4>
-                    <textarea id="offerInput" class="sync-textarea" placeholder="Paste Offer Code here..."
+                    <h4>1. Paste Import Code here:</h4>
+                    <textarea id="offerInput" class="sync-textarea" placeholder="Paste Import Code here..."
                         oninput="autoProcessOffer()"></textarea>
-                    <button style="margin-bottom: 20px;" class="sync-btn" onclick="processOffer()">Generate Answer
-                        Code</button>
-                    <!-- Explicit button added -->
-                    <h4>2. Your Answer Code:</h4>
-                    <textarea id="answerCode" class="sync-textarea" placeholder="Generating answer code..."
+                    <button style="margin-bottom: 20px;" class="sync-btn" onclick="processOffer()">Generate
+                        Confirmation Code</button>
+                    <h4>2. Your Confirmation Code:</h4>
+                    <textarea id="answerCode" class="sync-textarea" placeholder="Generating confirmation code..."
                         readonly></textarea>
                     <button class="sync-copy-btn" onclick="copyCode('answerCode')">Copy Code</button>
-                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">3. Paste this Answer Code back
-                        into the first device.</p>
-                    <button class="reset-btn" onclick="cancelSync()">Cancel Session</button>
+                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">3. Paste this Confirmation Code
+                        back into the first device.</p>
+                    <button class="reset-btn" onclick="cancelSync()">Cancel</button>
                 </div>
 
                 <p class="sync-status" id="syncStatus">Status: Not connected</p>
@@ -1683,7 +1681,7 @@
             );
         }
 
-        // --- WebRTC Sync UI State Management ---
+        // --- WebRTC Import UI State Management ---
         function showSyncState(state) {
             document.getElementById('syncInitialState').style.display = 'none';
             document.getElementById('createSessionState').style.display = 'none';
@@ -1706,12 +1704,12 @@
 
         function showCreateSession() {
             showSyncState('create');
-            updateSyncStatus('Generating offer code...');
+            updateSyncStatus('Generating import code...');
         }
 
         function showJoinSession() {
             showSyncState('join');
-            updateSyncStatus('Ready to receive offer code.');
+            updateSyncStatus('Ready to paste import code.');
         }
 
         function cancelSync() {
@@ -1722,10 +1720,10 @@
             }
             showSyncState('initial');
             updateSyncStatus('Not connected');
-            showToast('Sync session cancelled.', 'info');
+            showToast('Import session cancelled.', 'info');
         }
 
-        // --- WebRTC Sync Logic ---
+        // --- WebRTC Import Logic ---
 
         function initializePeerConnection(isCreator) {
             // Close any existing connection
@@ -1736,7 +1734,7 @@
 
             isOfferer = isCreator;
             peerConnection = new RTCPeerConnection({ iceServers: iceServers });
-            updateSyncStatus('Initializing peer connection...');
+            updateSyncStatus('Initializing P2P connection...');
 
             // Handle ICE candidates: these are network details to exchange
             peerConnection.onicecandidate = (event) => {
@@ -1749,12 +1747,12 @@
                     if (peerConnection.localDescription) {
                         if (isOfferer) {
                             document.getElementById('offerCode').value = btoa(JSON.stringify(peerConnection.localDescription));
-                            updateSyncStatus('Offer code generated. Share it with the other device.');
-                            showToast('Offer code ready to copy.', 'info');
+                            updateSyncStatus('Import code generated. Share it with the other device.');
+                            showToast('Import code ready to copy.', 'info');
                         } else {
                             document.getElementById('answerCode').value = btoa(JSON.stringify(peerConnection.localDescription));
-                            updateSyncStatus('Answer code generated. Paste it back to the first device.');
-                            showToast('Answer code ready to copy.', 'info');
+                            updateSyncStatus('Confirmation code generated. Paste it back to the first device.');
+                            showToast('Confirmation code ready to copy.', 'info');
                         }
                     }
                 }
@@ -1764,14 +1762,16 @@
             peerConnection.oniceconnectionstatechange = () => {
                 console.log('ICE connection state:', peerConnection.iceConnectionState);
                 if (peerConnection.iceConnectionState === 'connected') {
-                    updateSyncStatus('Connected! Data channel opening...');
+                    updateSyncStatus('Connection established! Transferring data...');
                 } else if (peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') {
-                    updateSyncStatus('Connection failed or disconnected. Please try again.');
-                    showToast('Sync connection lost or failed. Please restart sync.', 'error', 5000);
+                    updateSyncStatus('Import connection failed or disconnected. Please try again.');
+                    showToast('Import connection lost or failed. Please restart import.', 'error', 5000);
                     cancelSync(); // Go back to initial state on major failure
                 } else if (peerConnection.iceConnectionState === 'closed') {
-                    updateSyncStatus('Connection closed.');
-                    showToast('Sync connection closed.', 'info');
+                    updateSyncStatus('Import connection closed.');
+                    showToast('Import session finished.', 'info');
+                    // Ensure UI resets to initial state after close
+                    showSyncState('initial');
                 }
             };
 
@@ -1797,17 +1797,30 @@
             dataChannel = channel; // Ensure global dataChannel is set
             dataChannel.onopen = () => {
                 console.log("Data channel is open!");
-                updateSyncStatus('Connection established! Syncing data...');
-                showToast('Sync connection established!', 'success', 5000);
-                // Send full data immediately upon connection
-                sendDailyDataToPeers(); // Send the current local state
+                updateSyncStatus('P2P connection established! Transferring data...');
+                showToast('P2P import connection established!', 'success', 5000);
+
+                // Send full data immediately upon connection if this is the offerer (creator)
+                // This implements the "creator's data should override joiner's" on initial connection.
+                if (isOfferer) {
+                    sendFullImportData();
+                }
             };
             dataChannel.onmessage = (event) => {
                 console.log("Message from peer:", event.data);
                 try {
                     const receivedPayload = JSON.parse(event.data);
-                    if (receivedPayload.type === 'FULL_SYNC' && receivedPayload.data) {
-                        mergeDailyData(receivedPayload);
+                    // Process the full import data only if it's from the offerer
+                    if (receivedPayload.type === 'FULL_IMPORT_DATA' && !isOfferer && receivedPayload.isSenderOfferer) {
+                        applyFullImportData(receivedPayload.data);
+                        showToast('Data imported successfully! Connection closing.', 'success', 5000);
+                        // Close connection immediately after import
+                        dataChannel.close();
+                    } else if (isOfferer && receivedPayload.type === 'FULL_IMPORT_DATA' && !receivedPayload.isSenderOfferer) {
+                        // Creator receives data from joiner (which is unexpected in this model, but acknowledge and close)
+                        console.log('Creator received data from Joiner. Ignoring and closing connection as import is one-way.');
+                        showToast('Joiner confirmed data receipt. Import complete. Connection closing.', 'info', 5000);
+                        dataChannel.close();
                     }
                 } catch (e) {
                     console.error("Error parsing received data:", e);
@@ -1817,11 +1830,13 @@
             dataChannel.onclose = () => {
                 console.log("Data channel closed.");
                 updateSyncStatus('Disconnected.');
-                showToast('Sync data channel closed.', 'info');
+                showToast('Import session finished.', 'info');
+                // Ensure UI resets to initial state after close
+                showSyncState('initial');
             };
             dataChannel.onerror = (error) => {
                 console.error("Data channel error:", error);
-                updateSyncStatus('Error during sync.');
+                updateSyncStatus('Error during import.');
                 showToast('An error occurred during data transfer: ' + error.message, 'error', 5000);
             };
         }
@@ -1845,8 +1860,8 @@
                 // The onicecandidate event listener will populate the offerCode textarea
             } catch (error) {
                 console.error("Error creating offer:", error);
-                updateSyncStatus('Error creating offer.');
-                showToast('Failed to create offer: ' + error.message, 'error', 5000);
+                updateSyncStatus('Error creating import code.');
+                showToast('Failed to create import code: ' + error.message, 'error', 5000);
                 cancelSync();
             }
         }
@@ -1857,11 +1872,11 @@
             const offerCode = offerInput.value.trim();
 
             if (!offerCode) {
-                showToast('Please paste an Offer Code to join a session.', 'info', 3000);
+                showToast('Please paste an Import Code to join a session.', 'info', 3000);
                 return;
             }
 
-            updateSyncStatus('Processing offer...');
+            updateSyncStatus('Processing import code...');
             if (!peerConnection) { // Ensure PC is initialized
                 initializePeerConnection(false);
             }
@@ -1872,7 +1887,7 @@
                 try {
                     decodedOffer = JSON.parse(atob(offerCode));
                 } catch (parseError) {
-                    throw new Error('Invalid Base64 or JSON format for Offer Code: ' + parseError.message);
+                    throw new Error('Invalid Base64 or JSON format for Import Code: ' + parseError.message);
                 }
 
                 if (decodedOffer.type !== 'offer') {
@@ -1885,9 +1900,9 @@
                 // The onicecandidate event listener will populate the answerCode textarea
             } catch (error) {
                 console.error("Error processing offer:", error);
-                updateSyncStatus('Error processing offer.');
-                showToast('Failed to process offer: ' + error.message, 'error', 7000);
-                document.getElementById('answerCode').value = 'Error generating answer.';
+                updateSyncStatus('Error processing import code.');
+                showToast('Failed to process import code: ' + error.message, 'error', 7000);
+                document.getElementById('answerCode').value = 'Error generating confirmation.';
                 cancelSync();
             }
         }
@@ -1898,34 +1913,34 @@
             const answerCode = answerInput.value.trim();
 
             if (!answerCode) {
-                showToast('Please paste the Answer Code to complete the connection.', 'info', 3000);
+                showToast('Please paste the Confirmation Code to complete the import.', 'info', 3000);
                 return;
             }
 
             if (!peerConnection || !isOfferer) {
-                showToast('Please create an offer first on this device, or ensure it is the offerer.', 'error', 5000);
+                showToast('Please create an import session first on this device, or ensure it is the creator.', 'error', 5000);
                 return;
             }
 
-            updateSyncStatus('Finalizing connection...');
+            updateSyncStatus('Finalizing import connection...');
             try {
                 let decodedAnswer;
                 try {
                     decodedAnswer = JSON.parse(atob(answerCode));
                 } catch (parseError) {
-                    throw new Error('Invalid Base64 or JSON format for Answer Code: ' + parseError.message);
+                    throw new Error('Invalid Base64 or JSON format for Confirmation Code: ' + parseError.message);
                 }
 
                 if (decodedAnswer.type !== 'answer') {
                     throw new Error('Invalid SDP type. Expected "answer". Received "' + decodedAnswer.type + '".');
                 }
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(decodedAnswer));
-                updateSyncStatus('Connection complete! Waiting for data channel to open.');
+                updateSyncStatus('Import connection complete! Data transfer in progress...');
                 answerInput.value = ''; // Clear answer input
             } catch (error) {
                 console.error("Error setting remote description with answer:", error);
-                updateSyncStatus('Error finalizing connection.');
-                showToast('Failed to finalize connection: ' + error.message, 'error', 7000);
+                updateSyncStatus('Error finalizing import connection.');
+                showToast('Failed to finalize import connection: ' + error.message, 'error', 7000);
                 cancelSync();
             }
         }
@@ -1948,75 +1963,74 @@
             }
         }
 
-        // --- Data Syncing and Merging (Revised for Global LWW) ---
+        // --- New One-Time Import Data Transfer Logic ---
 
-        function sendDailyDataToPeers() {
+        function sendFullImportData() {
             if (dataChannel && dataChannel.readyState === 'open') {
                 try {
-                    // Always update _lastModified on local dailyData before sending
+                    // Update timestamps before sending current state for import
                     dailyData._lastModified = new Date().toISOString();
-                    // And save it immediately to localStorage so that loadData always gets the latest timestamp
-                    localStorage.setItem('weeklyTrackerData', JSON.stringify(dailyData));
+                    // No need to save to local storage immediately, will save after confirmation or apply
+                    // localStorage.setItem('weeklyTrackerData', JSON.stringify(dailyData)); // Removed
+
+                    const fullStateToImport = {
+                        dailyData: dailyData,
+                        appSettings: appSettings
+                    };
 
                     const dataToSend = JSON.stringify({
-                        type: 'FULL_SYNC',
-                        data: dailyData, // Send the dailyData object which now has _lastModified
-                        // The timestamp in the payload is redundant if _lastModified is inside data,
-                        // but keeping it for clarity as the 'master' timestamp for this sync operation.
-                        timestamp: dailyData._lastModified
+                        type: 'FULL_IMPORT_DATA', // New type for clarity
+                        data: fullStateToImport,
+                        timestamp: new Date().toISOString(), // Timestamp for the payload itself
+                        isSenderOfferer: isOfferer // Indicate if sender is the offerer
                     });
                     dataChannel.send(dataToSend);
-                    console.log('Sent data to peer with timestamp:', dailyData._lastModified);
+                    console.log('Creator: Sent full data to joiner for one-time import.');
+                    showToast('Data sent for import. Waiting for joiner to process...', 'info', 3000);
+                    // Do NOT close here immediately. Wait for joiner's confirmation or until channel closes.
                 } catch (e) {
                     console.error('Failed to send data over data channel:', e);
-                    showToast('Failed to send data to peer. Connection issue?', 'error');
+                    showToast('Failed to send data. Connection issue?', 'error');
                 }
             }
         }
 
-        function mergeDailyData(incomingPayload) {
-            console.log('Merging incoming payload:', incomingPayload);
-            const incomingData = incomingPayload.data; // This is the actual dailyData object
-            const incomingTimestamp = incomingPayload.timestamp; // Global timestamp from the sending peer
+        /**
+         * Applies the full imported data to the local state.
+         * This function should only be called on the Joiner's side.
+         * @param {object} importedState - Object containing dailyData and appSettings.
+         */
+        function applyFullImportData(importedState) {
+            console.log('Joiner: Applying full imported data.');
+            // Overwrite local dailyData
+            dailyData = importedState.dailyData;
+            // Overwrite local appSettings
+            Object.assign(appSettings, importedState.appSettings); // Merge settings
 
-            if (!incomingTimestamp) {
-                console.warn('Received sync payload without a timestamp. Skipping merge to prevent data loss.');
-                showToast('Received incomplete sync data. Merge skipped.', 'error');
-                return;
+            // Ensure _lastModified is present after overwrite
+            if (!dailyData._lastModified) {
+                dailyData._lastModified = new Date().toISOString();
             }
 
-            let localDataLastModified = new Date(0).toISOString(); // Default to epoch
+            // Update UI with new data and settings
+            updateAppSettingsUI(); // Update week start day, focus view, etc.
+            generateDays();
+            updateProgress();
+            optimizedSave(); // Save the newly imported data and settings
 
-            // Retrieve the local _lastModified timestamp directly from dailyData
-            if (dailyData._lastModified) {
-                localDataLastModified = dailyData._lastModified;
-            } else {
-                // If dailyData._lastModified is missing (e.g., old data format), set a default and save
-                dailyData._lastModified = new Date(0).toISOString();
-                optimizedSave(); // To save this new timestamp
-            }
-
-
-            // Compare timestamps for Global Last-Write-Wins
-            if (new Date(incomingTimestamp) > new Date(localDataLastModified)) {
-                console.log('Incoming data is newer. Replacing local data.');
-                dailyData = incomingData; // Full replacement
-                generateDays(); // Re-render UI
-                updateProgress(); // Update progress stats
-                optimizedSave(); // Save the new, updated dailyData (which will update its own timestamp in localStorage)
-                showToast('Data synced successfully!', 'success', 5000);
-            } else if (new Date(incomingTimestamp) < new Date(localDataLastModified)) {
-                console.log('Local data is newer. Sending local data back to peer.');
-                // If local data is newer, immediately send a full sync back to the peer
-                sendDailyDataToPeers();
-                showToast('Local data is newer. Sending update to peer.', 'info', 5000);
-            } else {
-                console.log('Incoming data has the same timestamp or is older. No merge needed.');
-                showToast('Data already up-to-date.', 'info');
+            // After processing, send a confirmation back to the creator (optional but good for robustness)
+            // Or simply let the channel close naturally
+            if (dataChannel && dataChannel.readyState === 'open') {
+                const confirmation = JSON.stringify({
+                    type: 'IMPORT_CONFIRMATION',
+                    timestamp: new Date().toISOString()
+                });
+                dataChannel.send(confirmation);
+                console.log('Joiner: Sent import confirmation to creator.');
             }
         }
 
-        // --- Original App Functions (with modifications for sync) ---
+        // --- Original App Functions (cleaned for sync calls) ---
 
         function createConfetti() {
             if (!appSettings.enableConfetti) return; // Check if confetti is enabled
@@ -2059,7 +2073,7 @@
         }
 
         function checkAllTasksCompleted() {
-            const dates = appSettings.isFocusView ? getFocusViewDates() : getWeekViewDates(); // Fixed from `isFocusView` to `appSettings.isFocusView`
+            const dates = appSettings.isFocusView ? getFocusViewDates() : getWeekViewDates();
             let totalTasks = 0;
             let completedTasks = 0;
 
@@ -2195,7 +2209,7 @@
 
             dates.forEach(date => {
                 const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-                const config = appSettings.dayConfigs[dayName]; // Use appSettings.dayConfigs
+                const config = appSettings.dayConfigs[dayName];
                 const dayCard = createDayCard(date, dayName, config);
                 daysGrid.appendChild(dayCard);
             });
@@ -2267,7 +2281,7 @@
                     id: Date.now(),
                     text: taskText,
                     completed: false,
-                    createdAt: new Date().toISOString() // Add createdAt for LWW
+                    createdAt: new Date().toISOString()
                 };
 
                 dailyData[dateKey].tasks.push(task);
@@ -2275,7 +2289,6 @@
                 renderTasks(dateKey);
                 updateProgress();
                 optimizedSave();
-                sendDailyDataToPeers(); // Send update after adding task
             }
         }
 
@@ -2309,22 +2322,19 @@
             const task = tasks.find(t => t.id === taskId);
             if (task) {
                 task.completed = !task.completed;
-                task.createdAt = new Date().toISOString(); // Update timestamp on modification
+                task.createdAt = new Date().toISOString();
                 renderTasks(dateKey);
                 updateProgress();
-                checkAllTasksCompleted(); // Check for confetti
+                checkAllTasksCompleted();
                 optimizedSave();
-                sendDailyDataToPeers(); // Send update after toggling task
             }
         }
 
         function deleteTask(dateKey, taskId) {
             dailyData[dateKey].tasks = dailyData[dateKey].tasks.filter(t => t.id !== taskId);
-            // No need to update createdAt for deletion, as it's a removal, but the global _lastModified on dailyData will handle the sync
             renderTasks(dateKey);
             updateProgress();
             optimizedSave();
-            sendDailyDataToPeers(); // Send update after deleting task
         }
 
         function startEditTask(dateKey, taskId) {
@@ -2355,9 +2365,8 @@
             if (task) {
                 if (newText && task.text !== newText) {
                     task.text = newText;
-                    task.createdAt = new Date().toISOString(); // Update timestamp on modification
+                    task.createdAt = new Date().toISOString();
                     optimizedSave();
-                    sendDailyDataToPeers(); // Send update after editing task
                 }
                 renderTasks(dateKey);
             }
@@ -2461,7 +2470,7 @@
             if (taskIndex === -1) return;
 
             const [movedTask] = sourceTasks.splice(taskIndex, 1);
-            movedTask.createdAt = new Date().toISOString(); // Mark as modified
+            movedTask.createdAt = new Date().toISOString();
 
             if (!dailyData[targetDateKey]) {
                 dailyData[targetDateKey] = { tasks: [] };
@@ -2488,7 +2497,6 @@
             renderTasks(targetDateKey);
             updateProgress();
             optimizedSave();
-            sendDailyDataToPeers(); // Send update after drag/drop
             draggedTask = null;
         }
 
@@ -2559,7 +2567,7 @@
 
             const messageIndex = Math.min(Math.floor(completionRate / 12.5), appSettings.motivationalMessages.length - 1);
             document.getElementById('motivationalMessage').textContent =
-                appSettings.motivationalMessages[messageIndex]; // Use appSettings.motivationalMessages
+                appSettings.motivationalMessages[messageIndex];
 
             const progressSection = document.querySelector('.progress-section');
             if (completionRate >= 80) {
@@ -2723,25 +2731,15 @@
 
                     showConfirmation('Do you want to merge with existing data? Click "OK" to merge, or "Cancel" to replace all data and settings.',
                         () => { // On Confirm (merge)
-                            // Call mergeDailyData with a payload structure similar to WebRTC
-                            mergeDailyData({
-                                type: 'FULL_SYNC',
-                                data: importedDailyData,
-                                timestamp: importedDailyData._lastModified
+                            // Call applyFullImportData with a payload structure similar to WebRTC
+                            applyFullImportData({
+                                dailyData: importedDailyData,
+                                appSettings: importedAppSettings
                             });
 
-                            // Only merge settings from imported file if it's newer (or if we have a strategy for it)
-                            // For simplicity, directly assign imported settings for now, user can reset if unhappy
-                            Object.assign(appSettings, importedAppSettings);
-                            optimizedSave(); // Save merged settings (and updated dailyData)
-                            updateAppSettingsUI(); // Update settings panel UI
-                            setupAutoSave(); // Apply new auto-save interval
-
-                            const totalDays = Object.keys(dailyData).length; // After merge, use current dailyData
-                            const totalTasks = Object.values(dailyData).reduce((total, day) => {
+                            showAlert(`✅ Data and settings merged successfully!\n\nDays in tracker: ${Object.keys(dailyData).length}\nTotal tasks: ${Object.values(dailyData).reduce((total, day) => {
                                 return total + (day.tasks ? day.tasks.length : 0);
-                            }, 0);
-                            showAlert(`✅ Data and settings merged successfully!\n\nDays in tracker: ${totalDays}\nTotal tasks: ${totalTasks}`, 'Import Complete');
+                            }, 0)}`, 'Import Complete');
                         },
                         () => { // On Cancel (replace)
                             dailyData = importedDailyData; // Replace all dailyData
