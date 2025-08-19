@@ -1103,19 +1103,31 @@
         }
 
         .day-config-item {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
+            display: grid;
+            grid-template-columns: 120px 1fr 2fr;
             gap: 10px;
+            align-items: center;
             margin-bottom: 10px;
             padding: 8px;
             background: #f7fafc;
             border-radius: 8px;
         }
 
+        @media (max-width: 600px) {
+            .day-config-item {
+                grid-template-columns: 1fr;
+                /* Stack on very small screens */
+            }
+
+            .day-config-item label {
+                width: 100%;
+                /* Full width for label when stacked */
+                margin-bottom: 5px;
+            }
+        }
+
         .day-config-item label {
             font-weight: bold;
-            min-width: 80px;
             color: #2d3748;
         }
 
@@ -1127,9 +1139,25 @@
             border: 1px solid #cbd5e0;
             border-radius: 5px;
             font-size: 0.9em;
-            min-width: 120px;
-            /* Adjust as needed */
         }
+
+        .day-config-item select {
+            /* Specific style for select tag */
+            padding-right: 30px;
+            /* Add space for chevron */
+            -webkit-appearance: none;
+            /* Remove default arrow on WebKit browsers */
+            -moz-appearance: none;
+            /* Remove default arrow on Firefox */
+            appearance: none;
+            /* Remove default arrow */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' d='M0 0h24v24H0V0z'/%3E%3Cpath d='M7 10l5 5 5-5H7z' fill='%23667eea'/%3E%3C/svg%3E");
+            /* Custom SVG arrow */
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 16px;
+        }
+
 
         .motivational-message-list {
             list-style: none;
@@ -1424,8 +1452,8 @@
     <script>
         // --- Constants for Default Settings ---
         const DEFAULT_DAY_CONFIGS = {
-            'Monday': { difficulty: 'hard', description: 'DSA & Core SWE Learning' },
-            'Tuesday': { difficulty: 'hard', description: 'DSA & Core SWE Learning' },
+            'Monday': { difficulty: 'hard', description: 'Hard Activities' },
+            'Tuesday': { difficulty: 'hard', description: 'Hard Acticities' },
             'Wednesday': { difficulty: 'medium', description: 'Medium Level Activities' },
             'Thursday': { difficulty: 'easy', description: 'Light Work' },
             'Friday': { difficulty: 'chill', description: 'Chill Day' },
