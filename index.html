@@ -500,7 +500,7 @@
 
         .view-toggle {
             position: absolute;
-            top: 0;
+            top: 60px;
             right: 0;
             display: flex;
             align-items: center;
@@ -987,8 +987,16 @@
             }
 
             .header h1 {
-                font-size: 2em;
-                margin: 1em 0;
+                font-size: 1.5em;
+                margin: 0.75em 0;
+            }
+
+            .header .header-emoji {
+                display: none;
+            }
+
+            .header .header-description {
+                font-size: 12px;
             }
 
             .header-content {
@@ -1000,6 +1008,10 @@
                 position: static;
                 justify-content: center;
                 margin-top: 10px;
+            }
+
+            .view-toggle .switch {
+                zoom: 0.6;
             }
 
             body {
@@ -1248,8 +1260,8 @@
         <div class="header">
             <div class="header-content">
                 <div class="header-text">
-                    <h1>🚀 Weekly Work Tracker</h1>
-                    <p>Stay consistent, track progress, achieve your goals!</p>
+                    <h1><span class="header-emoji">🚀</span> Weekly Work Tracker</h1>
+                    <p class="header-description">Stay consistent, track progress, achieve your goals!</p>
                 </div>
                 <div class="view-toggle">
                     <label class="switch">
@@ -1320,52 +1332,50 @@
             <div class="export-section">
                 <h3 style="color: #2d3748; margin-bottom: 15px;">📄 Data Management</h3>
                 <button class="export-btn" onclick="exportData()">📊 Export Data (JSON)</button>
-                <button class="import-btn" onclick="document.getElementById('fileInput').click()">📥 Import
-                    Data</button>
+                <button class="import-btn" onclick="document.getElementById('fileInput').click()">📥 Import Data
+                    (JSON)</button>
                 <button class="reset-btn" onclick="showResetConfirmation()">🗑️ Reset All Data</button>
                 <input type="file" id="fileInput" class="hidden-file-input" accept=".json" onchange="importData(event)">
             </div>
 
             <!-- New Sync Section -->
             <div class="sync-section">
-                <h3 style="color: #2d3748; margin-bottom: 15px;">🔗 Sync Devices (P2P)</h3>
+                <h3 style="color: #2d3748; margin-bottom: 15px;">🔗 Sync data between devices (P2P)</h3>
                 <div id="syncInitialState">
-                    <button class="sync-btn" onclick="showCreateSession()">Create New Sync Session</button>
-                    <button class="sync-btn" onclick="showJoinSession()">Join Existing Sync Session</button>
+                    <button class="sync-btn" onclick="showCreateSession()"> ⬆ Send Data</button>
+                    <button class="sync-btn" onclick="showJoinSession()"> ⬇ Receive Data</button>
                 </div>
 
                 <div id="createSessionState" style="display: none;">
-                    <h4>1. Share this Offer Code:</h4>
-                    <textarea id="offerCode" class="sync-textarea" placeholder="Generating offer code..."
+                    <h4>1. Share this code to send your data:</h4>
+                    <textarea id="offerCode" class="sync-textarea" placeholder="Generating data sharing code..."
                         readonly></textarea>
-                    <button class="sync-copy-btn" onclick="copyCode('offerCode')">Copy Code</button>
-                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">2. Waiting for Answer Code from
-                        the other device...</p>
-                    <h4>3. Paste Answer Code to connect:</h4>
-                    <textarea id="answerInput" class="sync-textarea" placeholder="Paste Answer Code here..."
+                    <button class="sync-copy-btn" onclick="copyCode('offerCode')">Copy Data Code</button>
+                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">2. Waiting for confirmation
+                        code from the other device...</p>
+                    <h4>3. Paste confirmation code to finalize sharing:</h4>
+                    <textarea id="answerInput" class="sync-textarea" placeholder="Paste Confirmation Code here..."
                         oninput="autoProcessAnswer()"></textarea>
-                    <button class="sync-btn" onclick="pasteAnswer()">Finalize Connection</button>
-                    <!-- Explicit button added -->
-                    <button class="reset-btn" onclick="cancelSync()">Cancel Session</button>
+                    <button class="sync-btn" onclick="pasteAnswer()">Finalize Data Sharing</button>
+                    <button class="reset-btn" onclick="cancelSync()">Cancel</button>
                 </div>
 
                 <div id="joinSessionState" style="display: none;">
-                    <h4>1. Paste Offer Code here:</h4>
-                    <textarea id="offerInput" class="sync-textarea" placeholder="Paste Offer Code here..."
+                    <h4>1. Paste the code to receive data:</h4>
+                    <textarea id="offerInput" class="sync-textarea" placeholder="Paste Data Sharing Code here..."
                         oninput="autoProcessOffer()"></textarea>
-                    <button style="margin-bottom: 20px;" class="sync-btn" onclick="processOffer()">Generate Answer
-                        Code</button>
-                    <!-- Explicit button added -->
-                    <h4>2. Your Answer Code:</h4>
-                    <textarea id="answerCode" class="sync-textarea" placeholder="Generating answer code..."
+                    <button style="margin-bottom: 20px;" class="sync-btn" onclick="processOffer()">Generate
+                        Confirmation Code</button>
+                    <h4>2. Your confirmation code:</h4>
+                    <textarea id="answerCode" class="sync-textarea" placeholder="Generating confirmation code..."
                         readonly></textarea>
-                    <button class="sync-copy-btn" onclick="copyCode('answerCode')">Copy Code</button>
-                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">3. Paste this Answer Code back
-                        into the first device.</p>
-                    <button class="reset-btn" onclick="cancelSync()">Cancel Session</button>
+                    <button class="sync-copy-btn" onclick="copyCode('answerCode')">Copy Confirmation Code</button>
+                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">3. Share this confirmation code
+                        back with the sender.</p>
+                    <button class="reset-btn" onclick="cancelSync()">Cancel</button>
                 </div>
 
-                <p class="sync-status" id="syncStatus">Status: Not connected</p>
+                <p class="sync-status" id="syncStatus">Status: Sync not initiated.</p>
             </div>
             <!-- End New Sync Section -->
             <div class="settings-btn-section" style="text-align: center; margin-top: 20px;">
@@ -1482,7 +1492,7 @@
         };
 
         // --- Global Variables ---
-        let dailyData = {};
+        let dailyData = {}; // Now includes _lastModified for sync
         let currentWeekOffset = 0;
         let appSettings = {}; // This will hold the active settings
 
@@ -1683,7 +1693,7 @@
             );
         }
 
-        // --- WebRTC Sync UI State Management ---
+        // --- WebRTC Import UI State Management ---
         function showSyncState(state) {
             document.getElementById('syncInitialState').style.display = 'none';
             document.getElementById('createSessionState').style.display = 'none';
@@ -1706,12 +1716,12 @@
 
         function showCreateSession() {
             showSyncState('create');
-            updateSyncStatus('Generating offer code...');
+            updateSyncStatus('Generating data sharing code...');
         }
 
         function showJoinSession() {
             showSyncState('join');
-            updateSyncStatus('Ready to receive offer code.');
+            updateSyncStatus('Ready to receive data. Paste sharing code.');
         }
 
         function cancelSync() {
@@ -1722,10 +1732,10 @@
             }
             showSyncState('initial');
             updateSyncStatus('Not connected');
-            showToast('Sync session cancelled.', 'info');
+            showToast('Data sharing cancelled.', 'info');
         }
 
-        // --- WebRTC Sync Logic ---
+        // --- WebRTC Import Logic ---
 
         function initializePeerConnection(isCreator) {
             // Close any existing connection
@@ -1736,7 +1746,7 @@
 
             isOfferer = isCreator;
             peerConnection = new RTCPeerConnection({ iceServers: iceServers });
-            updateSyncStatus('Initializing peer connection...');
+            updateSyncStatus('Initializing P2P connection for data sharing...');
 
             // Handle ICE candidates: these are network details to exchange
             peerConnection.onicecandidate = (event) => {
@@ -1749,12 +1759,12 @@
                     if (peerConnection.localDescription) {
                         if (isOfferer) {
                             document.getElementById('offerCode').value = btoa(JSON.stringify(peerConnection.localDescription));
-                            updateSyncStatus('Offer code generated. Share it with the other device.');
-                            showToast('Offer code ready to copy.', 'info');
+                            updateSyncStatus('Data sharing code generated. Share it with the receiving device.');
+                            showToast('Data sharing code ready to copy.', 'info');
                         } else {
                             document.getElementById('answerCode').value = btoa(JSON.stringify(peerConnection.localDescription));
-                            updateSyncStatus('Answer code generated. Paste it back to the first device.');
-                            showToast('Answer code ready to copy.', 'info');
+                            updateSyncStatus('Confirmation code generated. Paste it back to the sending device.');
+                            showToast('Confirmation code ready to copy.', 'info');
                         }
                     }
                 }
@@ -1764,14 +1774,16 @@
             peerConnection.oniceconnectionstatechange = () => {
                 console.log('ICE connection state:', peerConnection.iceConnectionState);
                 if (peerConnection.iceConnectionState === 'connected') {
-                    updateSyncStatus('Connected! Data channel opening...');
+                    updateSyncStatus('Connection established! Preparing data transfer...');
                 } else if (peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') {
-                    updateSyncStatus('Connection failed or disconnected. Please try again.');
-                    showToast('Sync connection lost or failed. Please restart sync.', 'error', 5000);
+                    updateSyncStatus('Data import connection failed or disconnected. Please try again.');
+                    showToast('Data import connection lost or failed. Please restart import.', 'error', 5000);
                     cancelSync(); // Go back to initial state on major failure
                 } else if (peerConnection.iceConnectionState === 'closed') {
-                    updateSyncStatus('Connection closed.');
-                    showToast('Sync connection closed.', 'info');
+                    updateSyncStatus('Data import connection closed.');
+                    showToast('Import session finished.', 'info');
+                    // Ensure UI resets to initial state after close
+                    showSyncState('initial');
                 }
             };
 
@@ -1797,20 +1809,30 @@
             dataChannel = channel; // Ensure global dataChannel is set
             dataChannel.onopen = () => {
                 console.log("Data channel is open!");
-                updateSyncStatus('Connection established! Syncing data...');
-                showToast('Sync connection established!', 'success', 5000);
-                // Send full data immediately upon connection
-                sendDailyDataToPeers(true);
+                updateSyncStatus('P2P connection established! Sending/Receiving data...');
+                showToast('P2P data sharing connection established!', 'success', 5000);
+
+                // Send full data immediately upon connection if this is the offerer (creator)
+                // This implements the "creator's data should override joiner's" on initial connection.
+                if (isOfferer) {
+                    sendFullImportData();
+                }
             };
             dataChannel.onmessage = (event) => {
                 console.log("Message from peer:", event.data);
                 try {
-                    const receivedData = JSON.parse(event.data);
-                    if (receivedData.type === 'FULL_SYNC' && receivedData.data) {
-                        mergeDailyData(receivedData.data);
-                        updateProgress(); // Re-render UI after merge
-                        optimizedSave(); // Save merged data locally
-                        showToast('Data synced successfully!', 'success', 5000); // Subtle toast notification
+                    const receivedPayload = JSON.parse(event.data);
+                    // Process the full import data only if it's from the offerer
+                    if (receivedPayload.type === 'FULL_IMPORT_DATA' && !isOfferer && receivedPayload.isSenderOfferer) {
+                        applyFullImportData(receivedPayload.data);
+                        showToast('Data imported successfully! Connection closing.', 'success', 5000);
+                        // Close connection immediately after import
+                        dataChannel.close();
+                    } else if (isOfferer && receivedPayload.type === 'FULL_IMPORT_DATA' && !receivedPayload.isSenderOfferer) {
+                        // Creator receives data from joiner (which is unexpected in this model, but acknowledge and close)
+                        console.log('Creator received data from Joiner. Ignoring and closing connection as import is one-way.');
+                        showToast('Receiver confirmed data receipt. Import complete. Connection closing.', 'info', 5000);
+                        dataChannel.close();
                     }
                 } catch (e) {
                     console.error("Error parsing received data:", e);
@@ -1819,12 +1841,14 @@
             };
             dataChannel.onclose = () => {
                 console.log("Data channel closed.");
-                updateSyncStatus('Disconnected.');
-                showToast('Sync data channel closed.', 'info');
+                updateSyncStatus('Data shared.');
+                showToast('Data sharing session finished.', 'info');
+                // Ensure UI resets to initial state after close
+                showSyncState('initial');
             };
             dataChannel.onerror = (error) => {
                 console.error("Data channel error:", error);
-                updateSyncStatus('Error during sync.');
+                updateSyncStatus('Error during import.');
                 showToast('An error occurred during data transfer: ' + error.message, 'error', 5000);
             };
         }
@@ -1848,8 +1872,8 @@
                 // The onicecandidate event listener will populate the offerCode textarea
             } catch (error) {
                 console.error("Error creating offer:", error);
-                updateSyncStatus('Error creating offer.');
-                showToast('Failed to create offer: ' + error.message, 'error', 5000);
+                updateSyncStatus('Error generating data sharing code.');
+                showToast('Failed to generate data sharing code: ' + error.message, 'error', 5000);
                 cancelSync();
             }
         }
@@ -1860,11 +1884,11 @@
             const offerCode = offerInput.value.trim();
 
             if (!offerCode) {
-                showToast('Please paste an Offer Code to join a session.', 'info', 3000);
+                showToast('Please paste the Data Sharing Code to receive data.', 'info', 3000);
                 return;
             }
 
-            updateSyncStatus('Processing offer...');
+            updateSyncStatus('Processing data sharing code...');
             if (!peerConnection) { // Ensure PC is initialized
                 initializePeerConnection(false);
             }
@@ -1875,7 +1899,7 @@
                 try {
                     decodedOffer = JSON.parse(atob(offerCode));
                 } catch (parseError) {
-                    throw new Error('Invalid Base64 or JSON format for Offer Code: ' + parseError.message);
+                    throw new Error('Invalid Base64 or JSON format for Data Sharing Code: ' + parseError.message);
                 }
 
                 if (decodedOffer.type !== 'offer') {
@@ -1888,9 +1912,9 @@
                 // The onicecandidate event listener will populate the answerCode textarea
             } catch (error) {
                 console.error("Error processing offer:", error);
-                updateSyncStatus('Error processing offer.');
-                showToast('Failed to process offer: ' + error.message, 'error', 7000);
-                document.getElementById('answerCode').value = 'Error generating answer.';
+                updateSyncStatus('Error processing data sharing code.');
+                showToast('Failed to process data sharing code: ' + error.message, 'error', 7000);
+                document.getElementById('answerCode').value = 'Error generating confirmation.';
                 cancelSync();
             }
         }
@@ -1901,34 +1925,34 @@
             const answerCode = answerInput.value.trim();
 
             if (!answerCode) {
-                showToast('Please paste the Answer Code to complete the connection.', 'info', 3000);
+                showToast('Please paste the Confirmation Code to complete the data import.', 'info', 3000);
                 return;
             }
 
             if (!peerConnection || !isOfferer) {
-                showToast('Please create an offer first on this device, or ensure it is the offerer.', 'error', 5000);
+                showToast('Please initiate data sharing on this device, or ensure it is the sender.', 'error', 5000);
                 return;
             }
 
-            updateSyncStatus('Finalizing connection...');
+            updateSyncStatus('Finalizing data transfer connection...');
             try {
                 let decodedAnswer;
                 try {
                     decodedAnswer = JSON.parse(atob(answerCode));
                 } catch (parseError) {
-                    throw new Error('Invalid Base64 or JSON format for Answer Code: ' + parseError.message);
+                    throw new Error('Invalid Base64 or JSON format for Confirmation Code: ' + parseError.message);
                 }
 
                 if (decodedAnswer.type !== 'answer') {
                     throw new Error('Invalid SDP type. Expected "answer". Received "' + decodedAnswer.type + '".');
                 }
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(decodedAnswer));
-                updateSyncStatus('Connection complete! Waiting for data channel to open.');
+                updateSyncStatus('Data transfer connection complete! Transfer in progress...');
                 answerInput.value = ''; // Clear answer input
             } catch (error) {
                 console.error("Error setting remote description with answer:", error);
-                updateSyncStatus('Error finalizing connection.');
-                showToast('Failed to finalize connection: ' + error.message, 'error', 7000);
+                updateSyncStatus('Error finalizing data import connection.');
+                showToast('Failed to finalize data import connection: ' + error.message, 'error', 7000);
                 cancelSync();
             }
         }
@@ -1951,99 +1975,74 @@
             }
         }
 
-        // --- Data Syncing and Merging ---
+        // --- New One-Time Import Data Transfer Logic ---
 
-        function sendDailyDataToPeers(force = false) {
-            // Only send if data channel is open and not currently receiving a full sync
+        function sendFullImportData() {
             if (dataChannel && dataChannel.readyState === 'open') {
                 try {
+                    // Update timestamps before sending current state for import
+                    dailyData._lastModified = new Date().toISOString();
+                    // No need to save to local storage immediately, will save after confirmation or apply
+                    // localStorage.setItem('weeklyTrackerData', JSON.stringify(dailyData)); // Removed
+
+                    const fullStateToImport = {
+                        dailyData: dailyData,
+                        appSettings: appSettings
+                    };
+
                     const dataToSend = JSON.stringify({
-                        type: 'FULL_SYNC',
-                        data: dailyData,
-                        lastModified: new Date().toISOString() // Add a timestamp for LWW
+                        type: 'FULL_IMPORT_DATA', // New type for clarity
+                        data: fullStateToImport,
+                        timestamp: new Date().toISOString(), // Timestamp for the payload itself
+                        isSenderOfferer: isOfferer // Indicate if sender is the offerer
                     });
                     dataChannel.send(dataToSend);
-                    console.log('Sent data to peer.');
-                    // showToast('Sending data...', 'info', 1000); // Optional: show toast for every send
+                    console.log('Sender: Sending full data for one-time import.');
+                    showToast('Data sent for import. Waiting for receiver to confirm...', 'info', 3000);
+                    // Do NOT close here immediately. Wait for joiner's confirmation or until channel closes.
                 } catch (e) {
                     console.error('Failed to send data over data channel:', e);
-                    // This error is expected if the channel closes mid-send, or is not ready
-                    showToast('Failed to send data to peer. Connection issue?', 'error');
+                    showToast('Failed to send data. Connection issue?', 'error');
                 }
             }
         }
 
-        function mergeDailyData(incomingDailyData) {
-            console.log('Merging incoming data:', incomingDailyData);
-            const currentDailyData = dailyData;
+        /**
+         * Applies the full imported data to the local state.
+         * This function should only be called on the Joiner's side.
+         * @param {object} importedState - Object containing dailyData and appSettings.
+         */
+        function applyFullImportData(importedState) {
+            console.log('Receiver: Applying full imported data.');
+            // Overwrite local dailyData
+            dailyData = importedState.dailyData;
+            // Overwrite local appSettings
+            Object.assign(appSettings, importedState.appSettings); // Merge settings
 
-            let hasChanged = false;
-
-            // Iterate over incoming data
-            for (const dateKey in incomingDailyData) {
-                const incomingDay = incomingDailyData[dateKey];
-                const localDay = currentDailyData[dateKey];
-
-                if (!localDay) {
-                    // Day doesn't exist locally, add it
-                    currentDailyData[dateKey] = incomingDay;
-                    hasChanged = true;
-                } else {
-                    // Day exists in both, merge tasks
-                    const incomingTasks = incomingDay.tasks || [];
-                    const localTasks = localDay.tasks || [];
-
-                    // Create a map for quick lookup of tasks by ID in both sets
-                    const allTasksMap = new Map();
-
-                    // Add local tasks to map
-                    localTasks.forEach(task => {
-                        allTasksMap.set(task.id, task);
-                    });
-
-                    // Add incoming tasks, applying last-write-wins based on createdAt
-                    incomingTasks.forEach(incomingTask => {
-                        const existingTask = allTasksMap.get(incomingTask.id);
-                        if (!existingTask || (incomingTask.createdAt && (!existingTask.createdAt || new Date(incomingTask.createdAt) > new Date(existingTask.createdAt)))) {
-                            allTasksMap.set(incomingTask.id, incomingTask);
-                            hasChanged = true; // Mark as changed if incoming is new or newer
-                        }
-                    });
-
-                    // Convert map back to array and sort by createdAt to maintain a consistent order
-                    const newTasksArray = Array.from(allTasksMap.values()).sort((a, b) => {
-                        if (a.createdAt && b.createdAt) {
-                            return a.createdAt.localeCompare(b.createdAt);
-                        }
-                        return 0; // Maintain original order if no createdAt for some reason
-                    });
-
-                    // Check if tasks array actually changed to avoid unnecessary re-renders
-                    if (JSON.stringify(localTasks) !== JSON.stringify(newTasksArray)) {
-                        currentDailyData[dateKey].tasks = newTasksArray;
-                        hasChanged = true;
-                    }
-                }
+            // Ensure _lastModified is present after overwrite
+            if (!dailyData._lastModified) {
+                dailyData._lastModified = new Date().toISOString();
             }
 
-            // Important: We need to also consider if a day exists locally but was
-            // explicitly deleted on the remote. For a simple LWW full sync, this is harder
-            // to do without tombstones. For now, we assume incoming data is additive/updating.
-            // If a day is removed from a peer, it won't be removed here until a manual reset
-            // or a more sophisticated sync mechanism is implemented.
+            // Update UI with new data and settings
+            updateAppSettingsUI(); // Update week start day, focus view, etc.
+            generateDays();
+            updateProgress();
+            optimizedSave(); // Save the newly imported data and settings
 
-            if (hasChanged) {
-                generateDays(); // Regenerate all day cards to reflect changes
-                updateProgress(); // Update progress bar
-                optimizedSave(); // Save merged data to localStorage
-                showToast('Data synced successfully!', 'success', 5000); // Subtle toast notification
-            } else {
-                console.log('No significant changes after merge.');
-                showToast('No new data to sync or data already up-to-date.', 'info');
+            // After processing, send a confirmation back to the creator (optional but good for robustness)
+            // Or simply let the channel close naturally
+            if (dataChannel && dataChannel.readyState === 'open') {
+                const confirmation = JSON.stringify({
+                    type: 'IMPORT_CONFIRMATION',
+                    timestamp: new Date().toISOString()
+                });
+                dataChannel.send(confirmation);
+                console.log('Receiver: Sent import confirmation to sender.');
             }
         }
 
-        // --- Original App Functions (with modifications for sync) ---
+        // --- Original App Functions (cleaned for sync calls) ---
 
         function createConfetti() {
             if (!appSettings.enableConfetti) return; // Check if confetti is enabled
@@ -2086,7 +2085,7 @@
         }
 
         function checkAllTasksCompleted() {
-            const dates = isFocusView ? getFocusViewDates() : getWeekViewDates();
+            const dates = appSettings.isFocusView ? getFocusViewDates() : getWeekViewDates();
             let totalTasks = 0;
             let completedTasks = 0;
 
@@ -2222,7 +2221,7 @@
 
             dates.forEach(date => {
                 const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-                const config = appSettings.dayConfigs[dayName]; // Use appSettings.dayConfigs
+                const config = appSettings.dayConfigs[dayName];
                 const dayCard = createDayCard(date, dayName, config);
                 daysGrid.appendChild(dayCard);
             });
@@ -2294,7 +2293,7 @@
                     id: Date.now(),
                     text: taskText,
                     completed: false,
-                    createdAt: new Date().toISOString() // Add createdAt for LWW
+                    createdAt: new Date().toISOString()
                 };
 
                 dailyData[dateKey].tasks.push(task);
@@ -2302,7 +2301,6 @@
                 renderTasks(dateKey);
                 updateProgress();
                 optimizedSave();
-                sendDailyDataToPeers(); // Send update after adding task
             }
         }
 
@@ -2336,22 +2334,19 @@
             const task = tasks.find(t => t.id === taskId);
             if (task) {
                 task.completed = !task.completed;
-                task.createdAt = new Date().toISOString(); // Update timestamp on modification
+                task.createdAt = new Date().toISOString();
                 renderTasks(dateKey);
                 updateProgress();
-                checkAllTasksCompleted(); // Check for confetti
+                checkAllTasksCompleted();
                 optimizedSave();
-                sendDailyDataToPeers(); // Send update after toggling task
             }
         }
 
         function deleteTask(dateKey, taskId) {
             dailyData[dateKey].tasks = dailyData[dateKey].tasks.filter(t => t.id !== taskId);
-            // No need to update createdAt for deletion, as it's a removal
             renderTasks(dateKey);
             updateProgress();
             optimizedSave();
-            sendDailyDataToPeers(); // Send update after deleting task
         }
 
         function startEditTask(dateKey, taskId) {
@@ -2382,9 +2377,8 @@
             if (task) {
                 if (newText && task.text !== newText) {
                     task.text = newText;
-                    task.createdAt = new Date().toISOString(); // Update timestamp on modification
+                    task.createdAt = new Date().toISOString();
                     optimizedSave();
-                    sendDailyDataToPeers(); // Send update after editing task
                 }
                 renderTasks(dateKey);
             }
@@ -2488,7 +2482,7 @@
             if (taskIndex === -1) return;
 
             const [movedTask] = sourceTasks.splice(taskIndex, 1);
-            movedTask.createdAt = new Date().toISOString(); // Mark as modified
+            movedTask.createdAt = new Date().toISOString();
 
             if (!dailyData[targetDateKey]) {
                 dailyData[targetDateKey] = { tasks: [] };
@@ -2515,7 +2509,6 @@
             renderTasks(targetDateKey);
             updateProgress();
             optimizedSave();
-            sendDailyDataToPeers(); // Send update after drag/drop
             draggedTask = null;
         }
 
@@ -2562,9 +2555,7 @@
                 if (dailyData[dateKey] && dailyData[dateKey].tasks) {
                     const dayTasks = dailyData[dateKey].tasks;
                     totalTasks += dayTasks.length;
-                    const dayCompleted = dayTasks.filter(task => task.completed).length;
-                    completedTasks += dayCompleted;
-                    if (dayCompleted > 0) daysWithCompletedTasks++;
+                    completedTasks += dayTasks.filter(task => task.completed).length;
                 }
             });
 
@@ -2586,14 +2577,14 @@
 
             const messageIndex = Math.min(Math.floor(completionRate / 12.5), appSettings.motivationalMessages.length - 1);
             document.getElementById('motivationalMessage').textContent =
-                appSettings.motivationalMessages[messageIndex]; // Use appSettings.motivationalMessages
+                appSettings.motivationalMessages[messageIndex];
 
             const progressSection = document.querySelector('.progress-section');
-            if (completionRate >= 80) {
-                progressSection.classList.add('pulse');
-            } else {
-                progressSection.classList.remove('pulse');
-            }
+            // if (completionRate >= 80) {
+            //     progressSection.classList.add('pulse');
+            // } else {
+            //     progressSection.classList.remove('pulse');
+            // }
         }
 
         function exportData() {
@@ -2604,7 +2595,7 @@
                 version: "2.2", // Updated version for WebRTC integration and settings
                 exportDate: new Date().toISOString(),
                 appSettings: appSettings, // Export all app settings
-                dailyData: dailyData,
+                dailyData: dailyData, // Export current dailyData (includes _lastModified)
                 metadata: {
                     totalDays: Object.keys(dailyData).length,
                     totalTasks: Object.values(dailyData).reduce((total, day) => {
@@ -2632,21 +2623,13 @@
 
         function showResetConfirmation() {
             showConfirmation(
-                '⚠️ WARNING: This will permanently delete ALL your data!\n\n' +
-                'This includes:\n' +
-                '• All tasks from all dates\n' +
-                '• Your progress history\n' +
-                '• Week start preferences\n\n' +
-                'This action cannot be undone.\n\n' +
-                'Are you absolutely sure you want to reset everything?',
+                "⚠️ Warning: This will permanently erase all tasks, history, and preferences. This action cannot be undone—are you sure you want to continue?",
                 () => { // onConfirm
                     showConfirmation(
-                        '🚨 FINAL WARNING!\n\n' +
-                        'You are about to lose ALL your data permanently.\n\n' +
-                        'Click OK to proceed with the reset, or Cancel to keep your data.',
+                        "🚨 Final Warning: Proceeding will permanently erase all your data. Click OK to reset everything, or Cancel to keep your data.",
                         () => { // onConfirm final
                             try {
-                                dailyData = {};
+                                dailyData = { _lastModified: new Date().toISOString() }; // Reset with new timestamp
                                 // Reset app settings to defaults
                                 appSettings = JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS));
 
@@ -2706,17 +2689,34 @@
                         // Old format (version 2.0 or earlier)
                         console.log('Converting old data format to new date-based format...');
                         Object.keys(importedRawData.weeklyData).forEach(weekKey => {
-                            const weekOffset = parseInt(weekKey.split('_')[1]);
-                            const weekStartDate = getWeekStartDate(weekOffset); // This uses existing appSettings.weekStartDay
+                            const weekOffsetMatch = weekKey.match(/week_offset_(-?\d+)/);
+                            if (weekOffsetMatch) {
+                                const weekOffset = parseInt(weekOffsetMatch[1]);
+                                const tempWeekStartDay = appSettings.weekStartDay !== undefined ? appSettings.weekStartDay : DEFAULT_APP_SETTINGS.weekStartDay;
+                                const tempGetWeekStartDate = (offset = 0) => {
+                                    const today = new Date();
+                                    const targetDay = new Date(today);
+                                    const dayDiff = (today.getDay() - tempWeekStartDay + 7) % 7;
+                                    targetDay.setDate(today.getDate() - dayDiff + (offset * 7));
+                                    return targetDay;
+                                };
+                                const weekStartDate = tempGetWeekStartDate(weekOffset);
 
-                            Object.keys(importedRawData.weeklyData[weekKey]).forEach(dayName => {
-                                const dayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(dayName);
-                                const dayDate = new Date(weekStartDate);
-                                dayDate.setDate(weekStartDate.getDate() + dayIndex);
-                                const dateKey = formatDateKey(dayDate);
-
-                                importedDailyData[dateKey] = importedRawData.weeklyData[weekKey][dayName];
-                            });
+                                Object.keys(importedRawData.weeklyData[weekKey]).forEach(dayName => {
+                                    const dayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(dayName);
+                                    const dayDate = new Date(weekStartDate);
+                                    dayDate.setDate(weekStartDate.getDate() + dayIndex);
+                                    const dateKey = formatDateKey(dayDate);
+                                    importedDailyData[dateKey] = importedRawData.weeklyData[weekKey][dayName];
+                                    if (importedDailyData[dateKey].tasks) {
+                                        importedDailyData[dateKey].tasks.forEach(task => {
+                                            if (!task.createdAt) {
+                                                task.createdAt = new Date().toISOString();
+                                            }
+                                        });
+                                    }
+                                });
+                            }
                         });
                         // Default app settings for very old versions
                         importedAppSettings = JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS));
@@ -2725,28 +2725,32 @@
                         throw new Error('Invalid data format - no recognized data structure found');
                     }
 
+                    // Ensure importedDailyData has _lastModified timestamp for merge logic
+                    if (!importedDailyData._lastModified) {
+                        importedDailyData._lastModified = new Date().toISOString();
+                    }
+
+
                     showConfirmation('Do you want to merge with existing data? Click "OK" to merge, or "Cancel" to replace all data and settings.',
                         () => { // On Confirm (merge)
-                            mergeDailyData(importedDailyData); // Use the dedicated merge function for dailyData
-                            // Merge settings (simple override for now, can be more granular if needed)
-                            Object.assign(appSettings, importedAppSettings);
-                            optimizedSave();
-                            updateAppSettingsUI(); // Update settings panel UI
-                            setupAutoSave(); // Apply new auto-save interval
-                            const totalDays = Object.keys(importedDailyData).length;
-                            const totalTasks = Object.values(importedDailyData).reduce((total, day) => {
+                            // Call applyFullImportData with a payload structure similar to WebRTC
+                            applyFullImportData({
+                                dailyData: importedDailyData,
+                                appSettings: importedAppSettings
+                            });
+
+                            showAlert(`✅ Data and settings merged successfully!\n\nDays in tracker: ${Object.keys(dailyData).length}\nTotal tasks: ${Object.values(dailyData).reduce((total, day) => {
                                 return total + (day.tasks ? day.tasks.length : 0);
-                            }, 0);
-                            showAlert(`✅ Data and settings merged successfully!\n\nDays imported: ${totalDays}\nTotal tasks: ${totalTasks}`, 'Import Complete');
+                            }, 0)}`, 'Import Complete');
                         },
                         () => { // On Cancel (replace)
-                            dailyData = importedDailyData;
+                            dailyData = importedDailyData; // Replace all dailyData
                             appSettings = importedAppSettings; // Replace all app settings
-                            optimizedSave();
+                            optimizedSave(); // Save replacement
                             updateAppSettingsUI(); // Update settings panel UI
                             setupAutoSave(); // Apply new auto-save interval
-                            const totalDays = Object.keys(importedDailyData).length;
-                            const totalTasks = Object.values(importedDailyData).reduce((total, day) => {
+                            const totalDays = Object.keys(dailyData).length;
+                            const totalTasks = Object.values(dailyData).reduce((total, day) => {
                                 return total + (day.tasks ? day.tasks.length : 0);
                             }, 0);
                             showAlert(`✅ Data and settings replaced successfully!\n\nDays imported: ${totalDays}\nTotal tasks: ${totalTasks}`, 'Import Complete');
@@ -2792,6 +2796,7 @@
 
         function saveData() {
             try {
+                dailyData._lastModified = new Date().toISOString(); // Always update timestamp before saving
                 localStorage.setItem('weeklyTrackerData', JSON.stringify(dailyData));
                 localStorage.setItem('weeklyTrackerSettings', JSON.stringify({
                     weekStartDay: appSettings.weekStartDay,
@@ -2801,7 +2806,7 @@
                     autoSaveIntervalMinutes: appSettings.autoSaveIntervalMinutes,
                     enableConfetti: appSettings.enableConfetti
                 }));
-                console.log('✅ Data and settings saved to localStorage');
+                console.log('✅ Data and settings saved to localStorage with timestamp:', dailyData._lastModified);
             } catch (error) {
                 console.warn('❌ Failed to save to localStorage:', error);
             }
@@ -2809,33 +2814,57 @@
 
         function loadData() {
             try {
-                const savedDailyData = localStorage.getItem('weeklyTrackerData');
-                if (savedDailyData) {
-                    dailyData = JSON.parse(savedDailyData);
+                const savedDailyDataStr = localStorage.getItem('weeklyTrackerData');
+                if (savedDailyDataStr) {
+                    dailyData = JSON.parse(savedDailyDataStr);
+                    // Ensure _lastModified is present for existing data
+                    if (!dailyData._lastModified) {
+                        dailyData._lastModified = new Date(0).toISOString(); // Default to epoch if missing
+                        console.log('Set _lastModified for old dailyData format.');
+                    }
                     // For backward compatibility: if dailyData is old weeklyData format
-                    if (!Object.keys(dailyData).some(key => key.includes('-'))) { // Check for YYYY-MM-DD format
+                    if (!Object.keys(dailyData).some(key => key.includes('-')) && Object.keys(dailyData).some(key => key.startsWith('week_offset_'))) {
                         console.log('Converting saved dailyData from old weeklyData format...');
-                        let tempDailyData = {};
+                        let tempDailyData = { _lastModified: new Date().toISOString() }; // Initialize with timestamp
+                        const tempWeekStartDay = appSettings.weekStartDay !== undefined ? appSettings.weekStartDay : DEFAULT_APP_SETTINGS.weekStartDay;
+                        const tempGetWeekStartDate = (offset = 0) => {
+                            const today = new Date();
+                            const targetDay = new Date(today);
+                            const dayDiff = (today.getDay() - tempWeekStartDay + 7) % 7;
+                            targetDay.setDate(today.getDate() - dayDiff + (offset * 7));
+                            return targetDay;
+                        };
+
                         Object.keys(dailyData).forEach(weekKey => {
                             const weekOffsetMatch = weekKey.match(/week_offset_(-?\d+)/);
                             if (weekOffsetMatch) {
                                 const weekOffset = parseInt(weekOffsetMatch[1]);
-                                const weekStartDate = getWeekStartDate(weekOffset); // This uses temporary appSettings.weekStartDay (default 1)
+                                const weekStartDate = tempGetWeekStartDate(weekOffset);
+
                                 Object.keys(dailyData[weekKey]).forEach(dayName => {
                                     const dayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(dayName);
                                     const dayDate = new Date(weekStartDate);
                                     dayDate.setDate(weekStartDate.getDate() + dayIndex);
                                     const dateKey = formatDateKey(dayDate);
                                     tempDailyData[dateKey] = dailyData[weekKey][dayName];
+                                    // Ensure tasks in old format have createdAt if missing, for LWW
+                                    if (tempDailyData[dateKey].tasks) {
+                                        tempDailyData[dateKey].tasks.forEach(task => {
+                                            if (!task.createdAt) {
+                                                task.createdAt = new Date().toISOString(); // Set a default createdAt if missing
+                                            }
+                                        });
+                                    }
                                 });
                             }
                         });
                         dailyData = tempDailyData;
-                        saveData(); // Resave in new format
+                        saveData(); // Resave in new format to include _lastModified and new structure
                     }
+                    console.log('✅ DailyData loaded from localStorage with timestamp:', dailyData._lastModified);
                 } else {
-                    dailyData = {};
-                    console.log('ℹ️ No saved dailyData found, starting fresh dailyData');
+                    dailyData = { _lastModified: new Date().toISOString() }; // Initialize with timestamp for new user
+                    console.log('ℹ️ No saved dailyData found, starting fresh dailyData with timestamp');
                 }
 
                 const savedSettings = localStorage.getItem('weeklyTrackerSettings');
@@ -2875,7 +2904,7 @@
             } catch (error) {
                 console.warn('❌ Failed to load data or settings from localStorage:', error);
                 // Fallback to defaults if loading fails
-                dailyData = {};
+                dailyData = { _lastModified: new Date().toISOString() }; // Initialize with timestamp
                 appSettings = JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS));
                 document.getElementById('weekStartDay').value = appSettings.weekStartDay;
                 document.getElementById('focusViewToggle').checked = appSettings.isFocusView;
@@ -2915,7 +2944,10 @@
             syncStatusElement = document.getElementById('syncStatus');
             syncToastElement = document.getElementById('syncToast');
 
-            loadData();
+            // Load settings first, as dailyData conversion in loadData might depend on appSettings.weekStartDay
+            // Also, appSettings is needed for renderSettings()
+            loadData(); // This now correctly loads both dailyData and appSettings
+
             updateWeekDisplay();
             generateDays();
             updateProgress();
@@ -2925,7 +2957,7 @@
 
             window.addEventListener('beforeunload', function () {
                 cleanupTimers();
-                saveData();
+                saveData(); // Ensure final save on close
                 if (peerConnection) {
                     peerConnection.close();
                 }
