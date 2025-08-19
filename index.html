@@ -277,6 +277,28 @@
             box-shadow: 0 5px 15px rgba(159, 122, 234, 0.4);
         }
 
+        .sync-copy-btn {
+            /* New style for copy buttons */
+            background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+            /* Lighter purple */
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            /* Slightly smaller than main sync buttons */
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .sync-copy-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(167, 139, 250, 0.4);
+        }
+
+
         .hidden-file-input {
             display: none;
         }
@@ -912,8 +934,11 @@
         .sync-toast {
             position: fixed;
             bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            /* Aligned to bottom */
+            right: 20px;
+            /* Aligned to right */
+            transform: none;
+            /* No horizontal transform needed */
             background-color: #333;
             color: white;
             padding: 12px 20px;
@@ -922,9 +947,12 @@
             z-index: 1001;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             opacity: 0;
-            transition: opacity 0.5s ease-in-out;
+            transition: opacity 0.5s ease-in-out, background-color 0.3s ease;
             pointer-events: none;
             /* Allows clicks to pass through */
+            min-width: 200px;
+            /* Ensure enough space for messages */
+            text-align: center;
         }
 
         .sync-toast.show {
@@ -983,6 +1011,16 @@
 
             .sync-controls {
                 flex-direction: column;
+            }
+
+            .sync-toast {
+                /* Adjust for mobile if needed */
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                transform: none;
+                width: auto;
+                min-width: unset;
             }
         }
     </style>
@@ -1089,12 +1127,13 @@
                     <h4>1. Share this Offer Code:</h4>
                     <textarea id="offerCode" class="sync-textarea" placeholder="Generating offer code..."
                         readonly></textarea>
-                    <button class="sync-btn" onclick="copyCode('offerCode')">Copy Code</button>
-                    <p style="margin-top: 10px; color: #718096;">2. Waiting for Answer Code from the other device...</p>
+                    <button class="sync-copy-btn" onclick="copyCode('offerCode')">Copy Code</button>
+                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">2. Waiting for Answer Code from
+                        the other device...</p>
                     <h4>3. Paste Answer Code to connect:</h4>
                     <textarea id="answerInput" class="sync-textarea" placeholder="Paste Answer Code here..."
                         oninput="autoProcessAnswer()"></textarea>
-                    <button class="sync-btn reset-btn" onclick="cancelSync()">Cancel Session</button>
+                    <button class="reset-btn" onclick="cancelSync()">Cancel Session</button>
                 </div>
 
                 <div id="joinSessionState" style="display: none;">
@@ -1104,10 +1143,10 @@
                     <h4>2. Your Answer Code:</h4>
                     <textarea id="answerCode" class="sync-textarea" placeholder="Generating answer code..."
                         readonly></textarea>
-                    <button class="sync-btn" onclick="copyCode('answerCode')">Copy Code</button>
-                    <p style="margin-top: 10px; color: #718096;">3. Paste this Answer Code back into the first device.
-                    </p>
-                    <button class="sync-btn reset-btn" onclick="cancelSync()">Cancel Session</button>
+                    <button class="sync-copy-btn" onclick="copyCode('answerCode')">Copy Code</button>
+                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">3. Paste this Answer Code back
+                        into the first device.</p>
+                    <button class="reset-btn" onclick="cancelSync()">Cancel Session</button>
                 </div>
 
                 <p class="sync-status" id="syncStatus">Status: Not connected</p>
@@ -1369,7 +1408,7 @@
             dataChannel.onopen = () => {
                 console.log("Data channel is open!");
                 updateSyncStatus('Connection established! Syncing data...');
-                showToast('Sync connection established!', 'success');
+                showToast('Sync connection established!', 'success', 5000);
                 // Send full data immediately upon connection
                 sendDailyDataToPeers(true);
             };
@@ -1381,7 +1420,7 @@
                         mergeDailyData(receivedData.data);
                         updateProgress(); // Re-render UI after merge
                         optimizedSave(); // Save merged data locally
-                        showToast('Data synced successfully!', 'success'); // Subtle toast notification
+                        showToast('Data synced successfully!', 'success', 5000); // Subtle toast notification
                     }
                 } catch (e) {
                     console.error("Error parsing received data:", e);
@@ -1442,9 +1481,15 @@
             document.getElementById('answerCode').value = 'Generating... Please wait.'; // Immediate feedback
 
             try {
-                const decodedOffer = JSON.parse(atob(offerCode));
+                let decodedOffer;
+                try {
+                    decodedOffer = JSON.parse(atob(offerCode));
+                } catch (parseError) {
+                    throw new Error('Invalid Base64 or JSON format for Offer Code: ' + parseError.message);
+                }
+
                 if (decodedOffer.type !== 'offer') {
-                    throw new Error('Invalid SDP type. Expected "offer".');
+                    throw new Error('Invalid SDP type. Expected "offer". Received "' + decodedOffer.type + '".');
                 }
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(decodedOffer));
 
@@ -1454,7 +1499,7 @@
             } catch (error) {
                 console.error("Error processing offer:", error);
                 updateSyncStatus('Error processing offer.');
-                showToast('Failed to process offer. Make sure the code is valid and an "offer". ' + error.message, 'error', 7000);
+                showToast('Failed to process offer: ' + error.message, 'error', 7000);
                 document.getElementById('answerCode').value = 'Error generating answer.';
                 cancelSync();
             }
@@ -1477,9 +1522,15 @@
 
             updateSyncStatus('Finalizing connection...');
             try {
-                const decodedAnswer = JSON.parse(atob(answerCode));
+                let decodedAnswer;
+                try {
+                    decodedAnswer = JSON.parse(atob(answerCode));
+                } catch (parseError) {
+                    throw new Error('Invalid Base64 or JSON format for Answer Code: ' + parseError.message);
+                }
+
                 if (decodedAnswer.type !== 'answer') {
-                    throw new Error('Invalid SDP type. Expected "answer".');
+                    throw new Error('Invalid SDP type. Expected "answer". Received "' + decodedAnswer.type + '".');
                 }
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(decodedAnswer));
                 updateSyncStatus('Connection complete! Waiting for data channel to open.');
@@ -1487,7 +1538,7 @@
             } catch (error) {
                 console.error("Error setting remote description with answer:", error);
                 updateSyncStatus('Error finalizing connection.');
-                showToast('Failed to finalize connection. Make sure the code is valid and an "answer". ' + error.message, 'error', 7000);
+                showToast('Failed to finalize connection: ' + error.message, 'error', 7000);
                 cancelSync();
             }
         }
@@ -1495,18 +1546,18 @@
         function autoProcessOffer() {
             const offerInput = document.getElementById('offerInput');
             // Basic check for string length that resembles Base64 SDP
+            // Increased delay to 300ms
             if (offerInput.value.length > 50 && offerInput.value.includes('=')) {
-                // Delay slightly to allow full paste, then process
-                setTimeout(() => processOffer(), 100);
+                setTimeout(() => processOffer(), 300);
             }
         }
 
         function autoProcessAnswer() {
             const answerInput = document.getElementById('answerInput');
             // Basic check for string length that resembles Base64 SDP
+            // Increased delay to 300ms
             if (answerInput.value.length > 50 && answerInput.value.includes('=')) {
-                // Delay slightly to allow full paste, then process
-                setTimeout(() => pasteAnswer(), 100);
+                setTimeout(() => pasteAnswer(), 300);
             }
         }
 
@@ -1595,7 +1646,7 @@
                 generateDays(); // Regenerate all day cards to reflect changes
                 updateProgress(); // Update progress bar
                 optimizedSave(); // Save merged data to localStorage
-                showToast('Data synced successfully!', 'success'); // Subtle toast notification
+                showToast('Data synced successfully!', 'success', 5000); // Subtle toast notification
             } else {
                 console.log('No significant changes after merge.');
                 showToast('No new data to sync or data already up-to-date.', 'info');
@@ -2406,7 +2457,7 @@
             const textarea = document.getElementById(elementId);
             textarea.select();
             document.execCommand('copy');
-            showToast('Code copied to clipboard!', 'success');
+            showToast('Code copied to clipboard!', 'success', 5000);
         }
 
         document.addEventListener('DOMContentLoaded', function () {
