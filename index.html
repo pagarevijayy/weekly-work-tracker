@@ -778,10 +778,13 @@
 
         /* New CSS for WebRTC Sync */
         .sync-section {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
             background: white;
             border-radius: 15px;
             padding: 25px;
-            margin-top: 20px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
@@ -1133,6 +1136,8 @@
                     <h4>3. Paste Answer Code to connect:</h4>
                     <textarea id="answerInput" class="sync-textarea" placeholder="Paste Answer Code here..."
                         oninput="autoProcessAnswer()"></textarea>
+                    <button class="sync-btn" onclick="pasteAnswer()">Finalize Connection</button>
+                    <!-- Explicit button added -->
                     <button class="reset-btn" onclick="cancelSync()">Cancel Session</button>
                 </div>
 
@@ -1140,6 +1145,9 @@
                     <h4>1. Paste Offer Code here:</h4>
                     <textarea id="offerInput" class="sync-textarea" placeholder="Paste Offer Code here..."
                         oninput="autoProcessOffer()"></textarea>
+                    <button style="margin-bottom: 20px;" class="sync-btn" onclick="processOffer()">Generate Answer
+                        Code</button>
+                    <!-- Explicit button added -->
                     <h4>2. Your Answer Code:</h4>
                     <textarea id="answerCode" class="sync-textarea" placeholder="Generating answer code..."
                         readonly></textarea>
@@ -1150,7 +1158,6 @@
                 </div>
 
                 <p class="sync-status" id="syncStatus">Status: Not connected</p>
-                <div id="syncToast" class="sync-toast"></div>
             </div>
             <!-- End New Sync Section -->
 
@@ -1173,6 +1180,9 @@
                 Pagare</a>
         </div>
     </div>
+
+    <!-- Toast Notification -->
+    <div id="syncToast" class="sync-toast"></div>
 
     <!-- Custom Modal for Confirmation/Alerts -->
     <div id="customModal" class="modal">
