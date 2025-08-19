@@ -1085,7 +1085,7 @@
         <div class="progress-section">
             <h2 class="progress-title">📊 Weekly Progress</h2>
             <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
             </div>
             <div class="weekly-stats">
                 <div class="stat-card">
@@ -2197,7 +2197,11 @@
 
             const progressFill = document.getElementById('progressFill');
             progressFill.style.width = `${completionRate}%`;
-            progressFill.textContent = `${completionRate}%`;
+            if (completionRate > 0) {
+                progressFill.textContent = `${completionRate}%`;
+            } else {
+                progressFill.textContent = '';
+            }
 
             const messageIndex = Math.min(Math.floor(completionRate / 12.5), motivationalMessages.length - 1);
             document.getElementById('motivationalMessage').textContent =
