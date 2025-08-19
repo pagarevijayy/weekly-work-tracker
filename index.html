@@ -1328,42 +1328,42 @@
 
             <!-- New Sync Section -->
             <div class="sync-section">
-                <h3 style="color: #2d3748; margin-bottom: 15px;">🔗 Sync Data (P2P)</h3>
+                <h3 style="color: #2d3748; margin-bottom: 15px;">🔗 Sync data between devices (P2P)</h3>
                 <div id="syncInitialState">
-                    <button class="sync-btn" onclick="showCreateSession()">Generate Import Code</button>
-                    <button class="sync-btn" onclick="showJoinSession()">Paste Import Code</button>
+                    <button class="sync-btn" onclick="showCreateSession()"> ⬆ Send Data</button>
+                    <button class="sync-btn" onclick="showJoinSession()"> ⬇ Receive Data</button>
                 </div>
 
                 <div id="createSessionState" style="display: none;">
-                    <h4>1. Share this Import Code:</h4>
-                    <textarea id="offerCode" class="sync-textarea" placeholder="Generating import code..."
+                    <h4>1. Share this Code to Send Your Data:</h4>
+                    <textarea id="offerCode" class="sync-textarea" placeholder="Generating data sharing code..."
                         readonly></textarea>
-                    <button class="sync-copy-btn" onclick="copyCode('offerCode')">Copy Code</button>
+                    <button class="sync-copy-btn" onclick="copyCode('offerCode')">Copy Data Code</button>
                     <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">2. Waiting for Confirmation
                         Code from the other device...</p>
-                    <h4>3. Paste Confirmation Code to finalize:</h4>
+                    <h4>3. Paste Confirmation Code to Finalize Sharing:</h4>
                     <textarea id="answerInput" class="sync-textarea" placeholder="Paste Confirmation Code here..."
                         oninput="autoProcessAnswer()"></textarea>
-                    <button class="sync-btn" onclick="pasteAnswer()">Finalize Import</button>
+                    <button class="sync-btn" onclick="pasteAnswer()">Finalize Data Sharing</button>
                     <button class="reset-btn" onclick="cancelSync()">Cancel</button>
                 </div>
 
                 <div id="joinSessionState" style="display: none;">
-                    <h4>1. Paste Import Code here:</h4>
-                    <textarea id="offerInput" class="sync-textarea" placeholder="Paste Import Code here..."
+                    <h4>1. Paste the Code to Receive Data:</h4>
+                    <textarea id="offerInput" class="sync-textarea" placeholder="Paste Data Sharing Code here..."
                         oninput="autoProcessOffer()"></textarea>
                     <button style="margin-bottom: 20px;" class="sync-btn" onclick="processOffer()">Generate
                         Confirmation Code</button>
                     <h4>2. Your Confirmation Code:</h4>
                     <textarea id="answerCode" class="sync-textarea" placeholder="Generating confirmation code..."
                         readonly></textarea>
-                    <button class="sync-copy-btn" onclick="copyCode('answerCode')">Copy Code</button>
-                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">3. Paste this Confirmation Code
-                        back into the first device.</p>
+                    <button class="sync-copy-btn" onclick="copyCode('answerCode')">Copy Confirmation Code</button>
+                    <p style="margin-top: 10px; margin-bottom: 15px; color: #718096;">3. Share this Confirmation Code
+                        back with the sender.</p>
                     <button class="reset-btn" onclick="cancelSync()">Cancel</button>
                 </div>
 
-                <p class="sync-status" id="syncStatus">Status: Not connected</p>
+                <p class="sync-status" id="syncStatus">Status: Sync not initiated.</p>
             </div>
             <!-- End New Sync Section -->
             <div class="settings-btn-section" style="text-align: center; margin-top: 20px;">
@@ -1704,12 +1704,12 @@
 
         function showCreateSession() {
             showSyncState('create');
-            updateSyncStatus('Generating import code...');
+            updateSyncStatus('Generating data sharing code...');
         }
 
         function showJoinSession() {
             showSyncState('join');
-            updateSyncStatus('Ready to paste import code.');
+            updateSyncStatus('Ready to receive data. Paste sharing code.');
         }
 
         function cancelSync() {
@@ -1720,7 +1720,7 @@
             }
             showSyncState('initial');
             updateSyncStatus('Not connected');
-            showToast('Import session cancelled.', 'info');
+            showToast('Data sharing cancelled.', 'info');
         }
 
         // --- WebRTC Import Logic ---
@@ -1734,7 +1734,7 @@
 
             isOfferer = isCreator;
             peerConnection = new RTCPeerConnection({ iceServers: iceServers });
-            updateSyncStatus('Initializing P2P connection...');
+            updateSyncStatus('Initializing P2P connection for data sharing...');
 
             // Handle ICE candidates: these are network details to exchange
             peerConnection.onicecandidate = (event) => {
@@ -1747,11 +1747,11 @@
                     if (peerConnection.localDescription) {
                         if (isOfferer) {
                             document.getElementById('offerCode').value = btoa(JSON.stringify(peerConnection.localDescription));
-                            updateSyncStatus('Import code generated. Share it with the other device.');
-                            showToast('Import code ready to copy.', 'info');
+                            updateSyncStatus('Data sharing code generated. Share it with the receiving device.');
+                            showToast('Data sharing code ready to copy.', 'info');
                         } else {
                             document.getElementById('answerCode').value = btoa(JSON.stringify(peerConnection.localDescription));
-                            updateSyncStatus('Confirmation code generated. Paste it back to the first device.');
+                            updateSyncStatus('Confirmation code generated. Paste it back to the sending device.');
                             showToast('Confirmation code ready to copy.', 'info');
                         }
                     }
@@ -1762,13 +1762,13 @@
             peerConnection.oniceconnectionstatechange = () => {
                 console.log('ICE connection state:', peerConnection.iceConnectionState);
                 if (peerConnection.iceConnectionState === 'connected') {
-                    updateSyncStatus('Connection established! Transferring data...');
+                    updateSyncStatus('Connection established! Preparing data transfer...');
                 } else if (peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') {
-                    updateSyncStatus('Import connection failed or disconnected. Please try again.');
-                    showToast('Import connection lost or failed. Please restart import.', 'error', 5000);
+                    updateSyncStatus('Data import connection failed or disconnected. Please try again.');
+                    showToast('Data import connection lost or failed. Please restart import.', 'error', 5000);
                     cancelSync(); // Go back to initial state on major failure
                 } else if (peerConnection.iceConnectionState === 'closed') {
-                    updateSyncStatus('Import connection closed.');
+                    updateSyncStatus('Data import connection closed.');
                     showToast('Import session finished.', 'info');
                     // Ensure UI resets to initial state after close
                     showSyncState('initial');
@@ -1797,8 +1797,8 @@
             dataChannel = channel; // Ensure global dataChannel is set
             dataChannel.onopen = () => {
                 console.log("Data channel is open!");
-                updateSyncStatus('P2P connection established! Transferring data...');
-                showToast('P2P import connection established!', 'success', 5000);
+                updateSyncStatus('P2P connection established! Sending/Receiving data...');
+                showToast('P2P data sharing connection established!', 'success', 5000);
 
                 // Send full data immediately upon connection if this is the offerer (creator)
                 // This implements the "creator's data should override joiner's" on initial connection.
@@ -1819,7 +1819,7 @@
                     } else if (isOfferer && receivedPayload.type === 'FULL_IMPORT_DATA' && !receivedPayload.isSenderOfferer) {
                         // Creator receives data from joiner (which is unexpected in this model, but acknowledge and close)
                         console.log('Creator received data from Joiner. Ignoring and closing connection as import is one-way.');
-                        showToast('Joiner confirmed data receipt. Import complete. Connection closing.', 'info', 5000);
+                        showToast('Receiver confirmed data receipt. Import complete. Connection closing.', 'info', 5000);
                         dataChannel.close();
                     }
                 } catch (e) {
@@ -1829,8 +1829,8 @@
             };
             dataChannel.onclose = () => {
                 console.log("Data channel closed.");
-                updateSyncStatus('Disconnected.');
-                showToast('Import session finished.', 'info');
+                updateSyncStatus('Data shared.');
+                showToast('Data sharing session finished.', 'info');
                 // Ensure UI resets to initial state after close
                 showSyncState('initial');
             };
@@ -1860,8 +1860,8 @@
                 // The onicecandidate event listener will populate the offerCode textarea
             } catch (error) {
                 console.error("Error creating offer:", error);
-                updateSyncStatus('Error creating import code.');
-                showToast('Failed to create import code: ' + error.message, 'error', 5000);
+                updateSyncStatus('Error generating data sharing code.');
+                showToast('Failed to generate data sharing code: ' + error.message, 'error', 5000);
                 cancelSync();
             }
         }
@@ -1872,11 +1872,11 @@
             const offerCode = offerInput.value.trim();
 
             if (!offerCode) {
-                showToast('Please paste an Import Code to join a session.', 'info', 3000);
+                showToast('Please paste the Data Sharing Code to receive data.', 'info', 3000);
                 return;
             }
 
-            updateSyncStatus('Processing import code...');
+            updateSyncStatus('Processing data sharing code...');
             if (!peerConnection) { // Ensure PC is initialized
                 initializePeerConnection(false);
             }
@@ -1887,7 +1887,7 @@
                 try {
                     decodedOffer = JSON.parse(atob(offerCode));
                 } catch (parseError) {
-                    throw new Error('Invalid Base64 or JSON format for Import Code: ' + parseError.message);
+                    throw new Error('Invalid Base64 or JSON format for Data Sharing Code: ' + parseError.message);
                 }
 
                 if (decodedOffer.type !== 'offer') {
@@ -1900,8 +1900,8 @@
                 // The onicecandidate event listener will populate the answerCode textarea
             } catch (error) {
                 console.error("Error processing offer:", error);
-                updateSyncStatus('Error processing import code.');
-                showToast('Failed to process import code: ' + error.message, 'error', 7000);
+                updateSyncStatus('Error processing data sharing code.');
+                showToast('Failed to process data sharing code: ' + error.message, 'error', 7000);
                 document.getElementById('answerCode').value = 'Error generating confirmation.';
                 cancelSync();
             }
@@ -1913,16 +1913,16 @@
             const answerCode = answerInput.value.trim();
 
             if (!answerCode) {
-                showToast('Please paste the Confirmation Code to complete the import.', 'info', 3000);
+                showToast('Please paste the Confirmation Code to complete the data import.', 'info', 3000);
                 return;
             }
 
             if (!peerConnection || !isOfferer) {
-                showToast('Please create an import session first on this device, or ensure it is the creator.', 'error', 5000);
+                showToast('Please initiate data sharing on this device, or ensure it is the sender.', 'error', 5000);
                 return;
             }
 
-            updateSyncStatus('Finalizing import connection...');
+            updateSyncStatus('Finalizing data transfer connection...');
             try {
                 let decodedAnswer;
                 try {
@@ -1935,12 +1935,12 @@
                     throw new Error('Invalid SDP type. Expected "answer". Received "' + decodedAnswer.type + '".');
                 }
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(decodedAnswer));
-                updateSyncStatus('Import connection complete! Data transfer in progress...');
+                updateSyncStatus('Data transfer connection complete! Transfer in progress...');
                 answerInput.value = ''; // Clear answer input
             } catch (error) {
                 console.error("Error setting remote description with answer:", error);
-                updateSyncStatus('Error finalizing import connection.');
-                showToast('Failed to finalize import connection: ' + error.message, 'error', 7000);
+                updateSyncStatus('Error finalizing data import connection.');
+                showToast('Failed to finalize data import connection: ' + error.message, 'error', 7000);
                 cancelSync();
             }
         }
@@ -1985,8 +1985,8 @@
                         isSenderOfferer: isOfferer // Indicate if sender is the offerer
                     });
                     dataChannel.send(dataToSend);
-                    console.log('Creator: Sent full data to joiner for one-time import.');
-                    showToast('Data sent for import. Waiting for joiner to process...', 'info', 3000);
+                    console.log('Sender: Sending full data for one-time import.');
+                    showToast('Data sent for import. Waiting for receiver to confirm...', 'info', 3000);
                     // Do NOT close here immediately. Wait for joiner's confirmation or until channel closes.
                 } catch (e) {
                     console.error('Failed to send data over data channel:', e);
@@ -2001,7 +2001,7 @@
          * @param {object} importedState - Object containing dailyData and appSettings.
          */
         function applyFullImportData(importedState) {
-            console.log('Joiner: Applying full imported data.');
+            console.log('Receiver: Applying full imported data.');
             // Overwrite local dailyData
             dailyData = importedState.dailyData;
             // Overwrite local appSettings
@@ -2026,7 +2026,7 @@
                     timestamp: new Date().toISOString()
                 });
                 dataChannel.send(confirmation);
-                console.log('Joiner: Sent import confirmation to creator.');
+                console.log('Receiver: Sent import confirmation to sender.');
             }
         }
 
@@ -2543,9 +2543,7 @@
                 if (dailyData[dateKey] && dailyData[dateKey].tasks) {
                     const dayTasks = dailyData[dateKey].tasks;
                     totalTasks += dayTasks.length;
-                    const dayCompleted = dayTasks.filter(task => task.completed).length;
-                    completedTasks += dayCompleted;
-                    if (dayCompleted > 0) daysWithCompletedTasks++;
+                    completedTasks += dayTasks.filter(task => task.completed).length;
                 }
             });
 
@@ -2570,11 +2568,11 @@
                 appSettings.motivationalMessages[messageIndex];
 
             const progressSection = document.querySelector('.progress-section');
-            if (completionRate >= 80) {
-                progressSection.classList.add('pulse');
-            } else {
-                progressSection.classList.remove('pulse');
-            }
+            // if (completionRate >= 80) {
+            //     progressSection.classList.add('pulse');
+            // } else {
+            //     progressSection.classList.remove('pulse');
+            // }
         }
 
         function exportData() {
