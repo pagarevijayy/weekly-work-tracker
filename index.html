@@ -761,6 +761,9 @@
             padding: 25px;
             margin-top: 20px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .sync-section h3 {
@@ -774,6 +777,7 @@
             justify-content: center;
             gap: 15px;
             margin-bottom: 20px;
+            width: 100%;
         }
 
         .sync-status {
@@ -792,6 +796,8 @@
             font-size: 0.9em;
             resize: vertical;
             margin-top: 10px;
+            margin-bottom: 10px;
+            /* Added margin for better spacing */
         }
 
         .sync-action-group {
@@ -803,6 +809,10 @@
             border: 1px solid #ebf8ff;
             border-radius: 10px;
             background: #f7fafc;
+            flex: 1;
+            /* Allows groups to grow */
+            min-width: 280px;
+            /* Minimum width for responsiveness */
         }
 
         .sync-action-group h4 {
@@ -814,7 +824,7 @@
             margin-bottom: 10px;
         }
 
-        /* Modal styling */
+        /* Custom Modal styling */
         .modal {
             display: none;
             /* Hidden by default */
@@ -898,6 +908,43 @@
             margin-top: 20px;
         }
 
+        /* New Toast Notification Styling */
+        .sync-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            z-index: 1001;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            pointer-events: none;
+            /* Allows clicks to pass through */
+        }
+
+        .sync-toast.show {
+            opacity: 1;
+        }
+
+        .sync-toast.success {
+            background-color: #48bb78;
+            /* Green */
+        }
+
+        .sync-toast.error {
+            background-color: #e53e3e;
+            /* Red */
+        }
+
+        .sync-toast.info {
+            background-color: #4299e1;
+            /* Blue */
+        }
 
         @media (max-width: 768px) {
             .days-grid {
@@ -1033,28 +1080,38 @@
             <!-- New Sync Section -->
             <div class="sync-section">
                 <h3 style="color: #2d3748; margin-bottom: 15px;">🔗 Sync Devices (P2P)</h3>
-                <div class="sync-controls">
-                    <div class="sync-action-group">
-                        <h4>Create Session</h4>
-                        <button class="sync-btn" onclick="createOffer()">Generate Offer Code</button>
-                        <textarea id="offerCode" class="sync-textarea" placeholder="Offer Code will appear here..."
-                            readonly></textarea>
-                        <button class="sync-btn" onclick="copyCode('offerCode')">Copy Offer Code</button>
-                        <button class="sync-btn" onclick="pasteAnswer()">Paste Answer Code</button>
-                        <textarea id="answerInput" class="sync-textarea" placeholder="Paste Answer Code here..."
-                            oninput="autoProcessAnswer()"></textarea>
-                    </div>
-                    <div class="sync-action-group">
-                        <h4>Join Session</h4>
-                        <textarea id="offerInput" class="sync-textarea" placeholder="Paste Offer Code here..."
-                            oninput="autoProcessOffer()"></textarea>
-                        <button class="sync-btn" onclick="processOffer()">Generate Answer Code</button>
-                        <textarea id="answerCode" class="sync-textarea" placeholder="Answer Code will appear here..."
-                            readonly></textarea>
-                        <button class="sync-btn" onclick="copyCode('answerCode')">Copy Answer Code</button>
-                    </div>
+                <div id="syncInitialState">
+                    <button class="sync-btn" onclick="showCreateSession()">Create New Sync Session</button>
+                    <button class="sync-btn" onclick="showJoinSession()">Join Existing Sync Session</button>
                 </div>
+
+                <div id="createSessionState" style="display: none;">
+                    <h4>1. Share this Offer Code:</h4>
+                    <textarea id="offerCode" class="sync-textarea" placeholder="Generating offer code..."
+                        readonly></textarea>
+                    <button class="sync-btn" onclick="copyCode('offerCode')">Copy Code</button>
+                    <p style="margin-top: 10px; color: #718096;">2. Waiting for Answer Code from the other device...</p>
+                    <h4>3. Paste Answer Code to connect:</h4>
+                    <textarea id="answerInput" class="sync-textarea" placeholder="Paste Answer Code here..."
+                        oninput="autoProcessAnswer()"></textarea>
+                    <button class="sync-btn reset-btn" onclick="cancelSync()">Cancel Session</button>
+                </div>
+
+                <div id="joinSessionState" style="display: none;">
+                    <h4>1. Paste Offer Code here:</h4>
+                    <textarea id="offerInput" class="sync-textarea" placeholder="Paste Offer Code here..."
+                        oninput="autoProcessOffer()"></textarea>
+                    <h4>2. Your Answer Code:</h4>
+                    <textarea id="answerCode" class="sync-textarea" placeholder="Generating answer code..."
+                        readonly></textarea>
+                    <button class="sync-btn" onclick="copyCode('answerCode')">Copy Code</button>
+                    <p style="margin-top: 10px; color: #718096;">3. Paste this Answer Code back into the first device.
+                    </p>
+                    <button class="sync-btn reset-btn" onclick="cancelSync()">Cancel Session</button>
+                </div>
+
                 <p class="sync-status" id="syncStatus">Status: Not connected</p>
+                <div id="syncToast" class="sync-toast"></div>
             </div>
             <!-- End New Sync Section -->
 
@@ -1104,6 +1161,7 @@
         let dataChannel = null;
         let isOfferer = false; // To distinguish between the initiator and receiver
         let syncStatusElement = null;
+        let syncToastElement = null; // New element for toast notifications
 
         // STUN servers for NAT traversal (no backend needed, just public servers)
         const iceServers = [
@@ -1173,6 +1231,71 @@
             ]);
         }
 
+        // --- Toast Notification Functions ---
+        let toastTimeout = null;
+
+        function showToast(message, type = 'info', duration = 3000) {
+            if (!syncToastElement) {
+                syncToastElement = document.getElementById('syncToast');
+            }
+            // Clear any existing timeout
+            if (toastTimeout) {
+                clearTimeout(toastTimeout);
+            }
+
+            // Reset classes
+            syncToastElement.className = 'sync-toast';
+            syncToastElement.textContent = message;
+            syncToastElement.classList.add('show', type);
+
+            // Hide after duration
+            toastTimeout = setTimeout(() => {
+                syncToastElement.classList.remove('show');
+            }, duration);
+        }
+
+        // --- WebRTC Sync UI State Management ---
+        function showSyncState(state) {
+            document.getElementById('syncInitialState').style.display = 'none';
+            document.getElementById('createSessionState').style.display = 'none';
+            document.getElementById('joinSessionState').style.display = 'none';
+
+            if (state === 'initial') {
+                document.getElementById('syncInitialState').style.display = 'block';
+                document.getElementById('offerCode').value = '';
+                document.getElementById('answerInput').value = '';
+                document.getElementById('offerInput').value = '';
+                document.getElementById('answerCode').value = '';
+            } else if (state === 'create') {
+                document.getElementById('createSessionState').style.display = 'block';
+                createOffer(); // Automatically start offer creation
+            } else if (state === 'join') {
+                document.getElementById('joinSessionState').style.display = 'block';
+                // User will paste offer code, and autoProcessOffer will trigger
+            }
+        }
+
+        function showCreateSession() {
+            showSyncState('create');
+            updateSyncStatus('Generating offer code...');
+        }
+
+        function showJoinSession() {
+            showSyncState('join');
+            updateSyncStatus('Ready to receive offer code.');
+        }
+
+        function cancelSync() {
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+                dataChannel = null;
+            }
+            showSyncState('initial');
+            updateSyncStatus('Not connected');
+            showToast('Sync session cancelled.', 'info');
+        }
+
         // --- WebRTC Sync Logic ---
 
         function initializePeerConnection(isCreator) {
@@ -1184,15 +1307,12 @@
 
             isOfferer = isCreator;
             peerConnection = new RTCPeerConnection({ iceServers: iceServers });
-            updateSyncStatus('Initializing...');
+            updateSyncStatus('Initializing peer connection...');
 
             // Handle ICE candidates: these are network details to exchange
             peerConnection.onicecandidate = (event) => {
                 if (event.candidate) {
-                    // Send this candidate to the other peer via signaling (manual copy/paste for now)
                     console.log('New ICE candidate:', event.candidate);
-                    // No need to display individual candidates for manual signaling,
-                    // they are bundled into the SDP offer/answer.
                 } else {
                     console.log('All ICE candidates gathered.');
                     // When all ICE candidates are gathered, the local description is complete.
@@ -1201,25 +1321,34 @@
                         if (isOfferer) {
                             document.getElementById('offerCode').value = btoa(JSON.stringify(peerConnection.localDescription));
                             updateSyncStatus('Offer code generated. Share it with the other device.');
+                            showToast('Offer code ready to copy.', 'info');
                         } else {
                             document.getElementById('answerCode').value = btoa(JSON.stringify(peerConnection.localDescription));
                             updateSyncStatus('Answer code generated. Paste it back to the first device.');
+                            showToast('Answer code ready to copy.', 'info');
                         }
                     }
                 }
             };
 
             // Handle ICE connection state changes
-            peerConnection.oniceconnectionstatechange = (event) => {
+            peerConnection.oniceconnectionstatechange = () => {
                 console.log('ICE connection state:', peerConnection.iceConnectionState);
                 if (peerConnection.iceConnectionState === 'connected') {
-                    updateSyncStatus('Connected! Syncing data...');
+                    updateSyncStatus('Connected! Data channel opening...');
                 } else if (peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') {
-                    updateSyncStatus('Disconnected or failed. Please try again.');
-                    showAlert('Sync connection lost or failed. Please try re-creating/joining a session.', 'Sync Error');
+                    updateSyncStatus('Connection failed or disconnected. Please try again.');
+                    showToast('Sync connection lost or failed. Please restart sync.', 'error', 5000);
+                    cancelSync(); // Go back to initial state on major failure
                 } else if (peerConnection.iceConnectionState === 'closed') {
                     updateSyncStatus('Connection closed.');
+                    showToast('Sync connection closed.', 'info');
                 }
+            };
+
+            // Handle signaling state changes (useful for debugging)
+            peerConnection.onsignalingstatechange = () => {
+                console.log('Signaling state:', peerConnection.signalingState);
             };
 
             // Handle data channel creation (for the offerer)
@@ -1240,6 +1369,7 @@
             dataChannel.onopen = () => {
                 console.log("Data channel is open!");
                 updateSyncStatus('Connection established! Syncing data...');
+                showToast('Sync connection established!', 'success');
                 // Send full data immediately upon connection
                 sendDailyDataToPeers(true);
             };
@@ -1251,19 +1381,22 @@
                         mergeDailyData(receivedData.data);
                         updateProgress(); // Re-render UI after merge
                         optimizedSave(); // Save merged data locally
+                        showToast('Data synced successfully!', 'success'); // Subtle toast notification
                     }
                 } catch (e) {
                     console.error("Error parsing received data:", e);
+                    showToast('Error receiving data from peer.', 'error');
                 }
             };
             dataChannel.onclose = () => {
                 console.log("Data channel closed.");
                 updateSyncStatus('Disconnected.');
+                showToast('Sync data channel closed.', 'info');
             };
             dataChannel.onerror = (error) => {
                 console.error("Data channel error:", error);
                 updateSyncStatus('Error during sync.');
-                showAlert('An error occurred during sync: ' + error.message, 'Sync Error');
+                showToast('An error occurred during data transfer: ' + error.message, 'error', 5000);
             };
         }
 
@@ -1276,9 +1409,10 @@
 
         // --- Offerer functions ---
         async function createOffer() {
-            updateSyncStatus('Creating session...');
-            initializePeerConnection(true); // This device is the offerer
-
+            if (!peerConnection) { // Ensure PC is initialized if user navigates away and comes back
+                initializePeerConnection(true);
+            }
+            document.getElementById('offerCode').value = 'Generating... Please wait.'; // Immediate feedback
             try {
                 const offer = await peerConnection.createOffer();
                 await peerConnection.setLocalDescription(offer);
@@ -1286,7 +1420,8 @@
             } catch (error) {
                 console.error("Error creating offer:", error);
                 updateSyncStatus('Error creating offer.');
-                showAlert('Failed to create offer: ' + error.message, 'Sync Error');
+                showToast('Failed to create offer: ' + error.message, 'error', 5000);
+                cancelSync();
             }
         }
 
@@ -1296,15 +1431,21 @@
             const offerCode = offerInput.value.trim();
 
             if (!offerCode) {
-                showAlert('Please paste an Offer Code to join a session.', 'Input Required');
+                showToast('Please paste an Offer Code to join a session.', 'info', 3000);
                 return;
             }
 
             updateSyncStatus('Processing offer...');
-            initializePeerConnection(false); // This device is the answerer
+            if (!peerConnection) { // Ensure PC is initialized
+                initializePeerConnection(false);
+            }
+            document.getElementById('answerCode').value = 'Generating... Please wait.'; // Immediate feedback
 
             try {
                 const decodedOffer = JSON.parse(atob(offerCode));
+                if (decodedOffer.type !== 'offer') {
+                    throw new Error('Invalid SDP type. Expected "offer".');
+                }
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(decodedOffer));
 
                 const answer = await peerConnection.createAnswer();
@@ -1313,7 +1454,9 @@
             } catch (error) {
                 console.error("Error processing offer:", error);
                 updateSyncStatus('Error processing offer.');
-                showAlert('Failed to process offer. Make sure the code is valid.', 'Sync Error');
+                showToast('Failed to process offer. Make sure the code is valid and an "offer". ' + error.message, 'error', 7000);
+                document.getElementById('answerCode').value = 'Error generating answer.';
+                cancelSync();
             }
         }
 
@@ -1323,44 +1466,49 @@
             const answerCode = answerInput.value.trim();
 
             if (!answerCode) {
-                showAlert('Please paste the Answer Code to complete the connection.', 'Input Required');
+                showToast('Please paste the Answer Code to complete the connection.', 'info', 3000);
                 return;
             }
 
             if (!peerConnection || !isOfferer) {
-                showAlert('Please create an offer first before pasting an answer.', 'Sync Error');
+                showToast('Please create an offer first on this device, or ensure it is the offerer.', 'error', 5000);
                 return;
             }
 
             updateSyncStatus('Finalizing connection...');
             try {
                 const decodedAnswer = JSON.parse(atob(answerCode));
+                if (decodedAnswer.type !== 'answer') {
+                    throw new Error('Invalid SDP type. Expected "answer".');
+                }
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(decodedAnswer));
                 updateSyncStatus('Connection complete! Waiting for data channel to open.');
                 answerInput.value = ''; // Clear answer input
             } catch (error) {
                 console.error("Error setting remote description with answer:", error);
                 updateSyncStatus('Error finalizing connection.');
-                showAlert('Failed to finalize connection. Make sure the code is valid.', 'Sync Error');
+                showToast('Failed to finalize connection. Make sure the code is valid and an "answer". ' + error.message, 'error', 7000);
+                cancelSync();
             }
         }
 
         function autoProcessOffer() {
             const offerInput = document.getElementById('offerInput');
-            // Check if it looks like a valid Base64 string that could be an SDP
-            if (offerInput.value.length > 50 && !peerConnection) { // Simple heuristic
-                processOffer();
+            // Basic check for string length that resembles Base64 SDP
+            if (offerInput.value.length > 50 && offerInput.value.includes('=')) {
+                // Delay slightly to allow full paste, then process
+                setTimeout(() => processOffer(), 100);
             }
         }
 
         function autoProcessAnswer() {
             const answerInput = document.getElementById('answerInput');
-            // Check if it looks like a valid Base64 string that could be an SDP
-            if (answerInput.value.length > 50 && peerConnection && isOfferer) { // Simple heuristic
-                pasteAnswer();
+            // Basic check for string length that resembles Base64 SDP
+            if (answerInput.value.length > 50 && answerInput.value.includes('=')) {
+                // Delay slightly to allow full paste, then process
+                setTimeout(() => pasteAnswer(), 100);
             }
         }
-
 
         // --- Data Syncing and Merging ---
 
@@ -1375,9 +1523,11 @@
                     });
                     dataChannel.send(dataToSend);
                     console.log('Sent data to peer.');
+                    // showToast('Sending data...', 'info', 1000); // Optional: show toast for every send
                 } catch (e) {
                     console.error('Failed to send data over data channel:', e);
                     // This error is expected if the channel closes mid-send, or is not ready
+                    showToast('Failed to send data to peer. Connection issue?', 'error');
                 }
             }
         }
@@ -1399,7 +1549,6 @@
                     hasChanged = true;
                 } else {
                     // Day exists in both, merge tasks
-                    const mergedTasks = [];
                     const incomingTasks = incomingDay.tasks || [];
                     const localTasks = localDay.tasks || [];
 
@@ -1414,46 +1563,42 @@
                     // Add incoming tasks, applying last-write-wins based on createdAt
                     incomingTasks.forEach(incomingTask => {
                         const existingTask = allTasksMap.get(incomingTask.id);
-                        if (!existingTask || new Date(incomingTask.createdAt) > new Date(existingTask.createdAt)) {
+                        if (!existingTask || (incomingTask.createdAt && (!existingTask.createdAt || new Date(incomingTask.createdAt) > new Date(existingTask.createdAt)))) {
                             allTasksMap.set(incomingTask.id, incomingTask);
                             hasChanged = true; // Mark as changed if incoming is new or newer
                         }
                     });
 
-                    // Handle tasks that might have been deleted on the incoming side
-                    // If a task exists locally but not in incoming, and it's an older timestamp, it means it might have been deleted remotely.
-                    // For now, a simpler LWW on the task level is sufficient; explicit deletion tracking is more complex.
-                    // This simple merge will keep tasks if they exist in either. If a task is truly deleted remotely,
-                    // and then a full sync happens, it might reappear if this side didn't also delete it.
-                    // For now, the current implementation handles "add" and "update" and relies on the fact that
-                    // if a task is completely gone from `incomingDailyData` for a given `dateKey`, it won't be re-added from incoming.
-                    // However, if a task was deleted locally and it still exists remotely with a newer timestamp, it will be brought back.
-                    // This is acceptable for a "last-write-wins" on task creation/modification.
+                    // Convert map back to array and sort by createdAt to maintain a consistent order
+                    const newTasksArray = Array.from(allTasksMap.values()).sort((a, b) => {
+                        if (a.createdAt && b.createdAt) {
+                            return a.createdAt.localeCompare(b.createdAt);
+                        }
+                        return 0; // Maintain original order if no createdAt for some reason
+                    });
 
-                    // Convert map back to array
-                    currentDailyData[dateKey].tasks = Array.from(allTasksMap.values()).sort((a, b) => a.createdAt.localeCompare(b.createdAt)); // Keep consistent order
-                    if (JSON.stringify(localTasks) !== JSON.stringify(currentDailyData[dateKey].tasks)) {
+                    // Check if tasks array actually changed to avoid unnecessary re-renders
+                    if (JSON.stringify(localTasks) !== JSON.stringify(newTasksArray)) {
+                        currentDailyData[dateKey].tasks = newTasksArray;
                         hasChanged = true;
                     }
                 }
             }
 
-            // Also check for days that exist locally but not in incoming (implies remote deletion of an entire day's tasks)
-            // This case is tricky with simple LWW. For simplicity, we assume incoming only *adds* or *updates* data for now.
-            // If a day is completely removed from remote, it won't remove it from local unless we iterate `currentDailyData`
-            // and remove keys not present in `incomingDailyData`, but this could lead to unintended data loss if
-            // one device hasn't synced for a while and has older, but still valid, local days.
-            // The safest approach for now is to only add/update, and let users manually clear old data if necessary,
-            // or implement more complex tombstone/conflict resolution.
+            // Important: We need to also consider if a day exists locally but was
+            // explicitly deleted on the remote. For a simple LWW full sync, this is harder
+            // to do without tombstones. For now, we assume incoming data is additive/updating.
+            // If a day is removed from a peer, it won't be removed here until a manual reset
+            // or a more sophisticated sync mechanism is implemented.
 
             if (hasChanged) {
-                // Ensure UI reflects merged data
                 generateDays(); // Regenerate all day cards to reflect changes
                 updateProgress(); // Update progress bar
                 optimizedSave(); // Save merged data to localStorage
-                showAlert('Data synced successfully!', 'Sync Complete');
+                showToast('Data synced successfully!', 'success'); // Subtle toast notification
             } else {
                 console.log('No significant changes after merge.');
+                showToast('No new data to sync or data already up-to-date.', 'info');
             }
         }
 
@@ -2261,17 +2406,20 @@
             const textarea = document.getElementById(elementId);
             textarea.select();
             document.execCommand('copy');
-            showAlert('Code copied to clipboard!', 'Copied!');
+            showToast('Code copied to clipboard!', 'success');
         }
 
         document.addEventListener('DOMContentLoaded', function () {
             syncStatusElement = document.getElementById('syncStatus'); // Initialize sync status element
+            syncToastElement = document.getElementById('syncToast'); // Initialize toast element
+
             loadData();
             updateWeekDisplay();
             generateDays();
             updateProgress();
 
             setupAutoSave();
+            showSyncState('initial'); // Initialize sync UI state
 
             window.addEventListener('beforeunload', function () {
                 cleanupTimers();
