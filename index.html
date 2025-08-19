@@ -1482,7 +1482,7 @@
         };
 
         // --- Global Variables ---
-        let dailyData = {};
+        let dailyData = {}; // Now includes _lastModified for sync
         let currentWeekOffset = 0;
         let appSettings = {}; // This will hold the active settings
 
@@ -1800,17 +1800,14 @@
                 updateSyncStatus('Connection established! Syncing data...');
                 showToast('Sync connection established!', 'success', 5000);
                 // Send full data immediately upon connection
-                sendDailyDataToPeers(true);
+                sendDailyDataToPeers(); // Send the current local state
             };
             dataChannel.onmessage = (event) => {
                 console.log("Message from peer:", event.data);
                 try {
-                    const receivedData = JSON.parse(event.data);
-                    if (receivedData.type === 'FULL_SYNC' && receivedData.data) {
-                        mergeDailyData(receivedData.data);
-                        updateProgress(); // Re-render UI after merge
-                        optimizedSave(); // Save merged data locally
-                        showToast('Data synced successfully!', 'success', 5000); // Subtle toast notification
+                    const receivedPayload = JSON.parse(event.data);
+                    if (receivedPayload.type === 'FULL_SYNC' && receivedPayload.data) {
+                        mergeDailyData(receivedPayload);
                     }
                 } catch (e) {
                     console.error("Error parsing received data:", e);
@@ -1951,95 +1948,71 @@
             }
         }
 
-        // --- Data Syncing and Merging ---
+        // --- Data Syncing and Merging (Revised for Global LWW) ---
 
-        function sendDailyDataToPeers(force = false) {
-            // Only send if data channel is open and not currently receiving a full sync
+        function sendDailyDataToPeers() {
             if (dataChannel && dataChannel.readyState === 'open') {
                 try {
+                    // Always update _lastModified on local dailyData before sending
+                    dailyData._lastModified = new Date().toISOString();
+                    // And save it immediately to localStorage so that loadData always gets the latest timestamp
+                    localStorage.setItem('weeklyTrackerData', JSON.stringify(dailyData));
+
                     const dataToSend = JSON.stringify({
                         type: 'FULL_SYNC',
-                        data: dailyData,
-                        lastModified: new Date().toISOString() // Add a timestamp for LWW
+                        data: dailyData, // Send the dailyData object which now has _lastModified
+                        // The timestamp in the payload is redundant if _lastModified is inside data,
+                        // but keeping it for clarity as the 'master' timestamp for this sync operation.
+                        timestamp: dailyData._lastModified
                     });
                     dataChannel.send(dataToSend);
-                    console.log('Sent data to peer.');
-                    // showToast('Sending data...', 'info', 1000); // Optional: show toast for every send
+                    console.log('Sent data to peer with timestamp:', dailyData._lastModified);
                 } catch (e) {
                     console.error('Failed to send data over data channel:', e);
-                    // This error is expected if the channel closes mid-send, or is not ready
                     showToast('Failed to send data to peer. Connection issue?', 'error');
                 }
             }
         }
 
-        function mergeDailyData(incomingDailyData) {
-            console.log('Merging incoming data:', incomingDailyData);
-            const currentDailyData = dailyData;
+        function mergeDailyData(incomingPayload) {
+            console.log('Merging incoming payload:', incomingPayload);
+            const incomingData = incomingPayload.data; // This is the actual dailyData object
+            const incomingTimestamp = incomingPayload.timestamp; // Global timestamp from the sending peer
 
-            let hasChanged = false;
-
-            // Iterate over incoming data
-            for (const dateKey in incomingDailyData) {
-                const incomingDay = incomingDailyData[dateKey];
-                const localDay = currentDailyData[dateKey];
-
-                if (!localDay) {
-                    // Day doesn't exist locally, add it
-                    currentDailyData[dateKey] = incomingDay;
-                    hasChanged = true;
-                } else {
-                    // Day exists in both, merge tasks
-                    const incomingTasks = incomingDay.tasks || [];
-                    const localTasks = localDay.tasks || [];
-
-                    // Create a map for quick lookup of tasks by ID in both sets
-                    const allTasksMap = new Map();
-
-                    // Add local tasks to map
-                    localTasks.forEach(task => {
-                        allTasksMap.set(task.id, task);
-                    });
-
-                    // Add incoming tasks, applying last-write-wins based on createdAt
-                    incomingTasks.forEach(incomingTask => {
-                        const existingTask = allTasksMap.get(incomingTask.id);
-                        if (!existingTask || (incomingTask.createdAt && (!existingTask.createdAt || new Date(incomingTask.createdAt) > new Date(existingTask.createdAt)))) {
-                            allTasksMap.set(incomingTask.id, incomingTask);
-                            hasChanged = true; // Mark as changed if incoming is new or newer
-                        }
-                    });
-
-                    // Convert map back to array and sort by createdAt to maintain a consistent order
-                    const newTasksArray = Array.from(allTasksMap.values()).sort((a, b) => {
-                        if (a.createdAt && b.createdAt) {
-                            return a.createdAt.localeCompare(b.createdAt);
-                        }
-                        return 0; // Maintain original order if no createdAt for some reason
-                    });
-
-                    // Check if tasks array actually changed to avoid unnecessary re-renders
-                    if (JSON.stringify(localTasks) !== JSON.stringify(newTasksArray)) {
-                        currentDailyData[dateKey].tasks = newTasksArray;
-                        hasChanged = true;
-                    }
-                }
+            if (!incomingTimestamp) {
+                console.warn('Received sync payload without a timestamp. Skipping merge to prevent data loss.');
+                showToast('Received incomplete sync data. Merge skipped.', 'error');
+                return;
             }
 
-            // Important: We need to also consider if a day exists locally but was
-            // explicitly deleted on the remote. For a simple LWW full sync, this is harder
-            // to do without tombstones. For now, we assume incoming data is additive/updating.
-            // If a day is removed from a peer, it won't be removed here until a manual reset
-            // or a more sophisticated sync mechanism is implemented.
+            let localDataLastModified = new Date(0).toISOString(); // Default to epoch
 
-            if (hasChanged) {
-                generateDays(); // Regenerate all day cards to reflect changes
-                updateProgress(); // Update progress bar
-                optimizedSave(); // Save merged data to localStorage
-                showToast('Data synced successfully!', 'success', 5000); // Subtle toast notification
+            // Retrieve the local _lastModified timestamp directly from dailyData
+            if (dailyData._lastModified) {
+                localDataLastModified = dailyData._lastModified;
             } else {
-                console.log('No significant changes after merge.');
-                showToast('No new data to sync or data already up-to-date.', 'info');
+                // If dailyData._lastModified is missing (e.g., old data format), set a default and save
+                dailyData._lastModified = new Date(0).toISOString();
+                optimizedSave(); // To save this new timestamp
+            }
+
+
+            // Compare timestamps for Global Last-Write-Wins
+            if (new Date(incomingTimestamp) > new Date(localDataLastModified)) {
+                console.log('Incoming data is newer. Replacing local data.');
+                dailyData = incomingData; // Full replacement
+                generateDays(); // Re-render UI
+                updateProgress(); // Update progress stats
+                optimizedSave(); // Save the new, updated dailyData (which will update its own timestamp in localStorage)
+                showToast('Data synced successfully!', 'success', 5000);
+            } else if (new Date(incomingTimestamp) < new Date(localDataLastModified)) {
+                console.log('Local data is newer. Sending local data back to peer.');
+                // If local data is newer, immediately send a full sync back to the peer
+                sendDailyDataToPeers();
+                showToast('Local data is newer. Sending update to peer.', 'info', 5000);
+            } else {
+                console.log('Incoming data has the same timestamp or is older. No merge needed.');
+                showToast('Data already up-to-date.', 'info');
             }
         }
 
@@ -2086,7 +2059,7 @@
         }
 
         function checkAllTasksCompleted() {
-            const dates = isFocusView ? getFocusViewDates() : getWeekViewDates();
+            const dates = appSettings.isFocusView ? getFocusViewDates() : getWeekViewDates(); // Fixed from `isFocusView` to `appSettings.isFocusView`
             let totalTasks = 0;
             let completedTasks = 0;
 
@@ -2347,7 +2320,7 @@
 
         function deleteTask(dateKey, taskId) {
             dailyData[dateKey].tasks = dailyData[dateKey].tasks.filter(t => t.id !== taskId);
-            // No need to update createdAt for deletion, as it's a removal
+            // No need to update createdAt for deletion, as it's a removal, but the global _lastModified on dailyData will handle the sync
             renderTasks(dateKey);
             updateProgress();
             optimizedSave();
@@ -2604,7 +2577,7 @@
                 version: "2.2", // Updated version for WebRTC integration and settings
                 exportDate: new Date().toISOString(),
                 appSettings: appSettings, // Export all app settings
-                dailyData: dailyData,
+                dailyData: dailyData, // Export current dailyData (includes _lastModified)
                 metadata: {
                     totalDays: Object.keys(dailyData).length,
                     totalTasks: Object.values(dailyData).reduce((total, day) => {
@@ -2646,7 +2619,7 @@
                         'Click OK to proceed with the reset, or Cancel to keep your data.',
                         () => { // onConfirm final
                             try {
-                                dailyData = {};
+                                dailyData = { _lastModified: new Date().toISOString() }; // Reset with new timestamp
                                 // Reset app settings to defaults
                                 appSettings = JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS));
 
@@ -2706,17 +2679,34 @@
                         // Old format (version 2.0 or earlier)
                         console.log('Converting old data format to new date-based format...');
                         Object.keys(importedRawData.weeklyData).forEach(weekKey => {
-                            const weekOffset = parseInt(weekKey.split('_')[1]);
-                            const weekStartDate = getWeekStartDate(weekOffset); // This uses existing appSettings.weekStartDay
+                            const weekOffsetMatch = weekKey.match(/week_offset_(-?\d+)/);
+                            if (weekOffsetMatch) {
+                                const weekOffset = parseInt(weekOffsetMatch[1]);
+                                const tempWeekStartDay = appSettings.weekStartDay !== undefined ? appSettings.weekStartDay : DEFAULT_APP_SETTINGS.weekStartDay;
+                                const tempGetWeekStartDate = (offset = 0) => {
+                                    const today = new Date();
+                                    const targetDay = new Date(today);
+                                    const dayDiff = (today.getDay() - tempWeekStartDay + 7) % 7;
+                                    targetDay.setDate(today.getDate() - dayDiff + (offset * 7));
+                                    return targetDay;
+                                };
+                                const weekStartDate = tempGetWeekStartDate(weekOffset);
 
-                            Object.keys(importedRawData.weeklyData[weekKey]).forEach(dayName => {
-                                const dayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(dayName);
-                                const dayDate = new Date(weekStartDate);
-                                dayDate.setDate(weekStartDate.getDate() + dayIndex);
-                                const dateKey = formatDateKey(dayDate);
-
-                                importedDailyData[dateKey] = importedRawData.weeklyData[weekKey][dayName];
-                            });
+                                Object.keys(importedRawData.weeklyData[weekKey]).forEach(dayName => {
+                                    const dayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(dayName);
+                                    const dayDate = new Date(weekStartDate);
+                                    dayDate.setDate(weekStartDate.getDate() + dayIndex);
+                                    const dateKey = formatDateKey(dayDate);
+                                    importedDailyData[dateKey] = importedRawData.weeklyData[weekKey][dayName];
+                                    if (importedDailyData[dateKey].tasks) {
+                                        importedDailyData[dateKey].tasks.forEach(task => {
+                                            if (!task.createdAt) {
+                                                task.createdAt = new Date().toISOString();
+                                            }
+                                        });
+                                    }
+                                });
+                            }
                         });
                         // Default app settings for very old versions
                         importedAppSettings = JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS));
@@ -2725,28 +2715,42 @@
                         throw new Error('Invalid data format - no recognized data structure found');
                     }
 
+                    // Ensure importedDailyData has _lastModified timestamp for merge logic
+                    if (!importedDailyData._lastModified) {
+                        importedDailyData._lastModified = new Date().toISOString();
+                    }
+
+
                     showConfirmation('Do you want to merge with existing data? Click "OK" to merge, or "Cancel" to replace all data and settings.',
                         () => { // On Confirm (merge)
-                            mergeDailyData(importedDailyData); // Use the dedicated merge function for dailyData
-                            // Merge settings (simple override for now, can be more granular if needed)
+                            // Call mergeDailyData with a payload structure similar to WebRTC
+                            mergeDailyData({
+                                type: 'FULL_SYNC',
+                                data: importedDailyData,
+                                timestamp: importedDailyData._lastModified
+                            });
+
+                            // Only merge settings from imported file if it's newer (or if we have a strategy for it)
+                            // For simplicity, directly assign imported settings for now, user can reset if unhappy
                             Object.assign(appSettings, importedAppSettings);
-                            optimizedSave();
+                            optimizedSave(); // Save merged settings (and updated dailyData)
                             updateAppSettingsUI(); // Update settings panel UI
                             setupAutoSave(); // Apply new auto-save interval
-                            const totalDays = Object.keys(importedDailyData).length;
-                            const totalTasks = Object.values(importedDailyData).reduce((total, day) => {
+
+                            const totalDays = Object.keys(dailyData).length; // After merge, use current dailyData
+                            const totalTasks = Object.values(dailyData).reduce((total, day) => {
                                 return total + (day.tasks ? day.tasks.length : 0);
                             }, 0);
-                            showAlert(`✅ Data and settings merged successfully!\n\nDays imported: ${totalDays}\nTotal tasks: ${totalTasks}`, 'Import Complete');
+                            showAlert(`✅ Data and settings merged successfully!\n\nDays in tracker: ${totalDays}\nTotal tasks: ${totalTasks}`, 'Import Complete');
                         },
                         () => { // On Cancel (replace)
-                            dailyData = importedDailyData;
+                            dailyData = importedDailyData; // Replace all dailyData
                             appSettings = importedAppSettings; // Replace all app settings
-                            optimizedSave();
+                            optimizedSave(); // Save replacement
                             updateAppSettingsUI(); // Update settings panel UI
                             setupAutoSave(); // Apply new auto-save interval
-                            const totalDays = Object.keys(importedDailyData).length;
-                            const totalTasks = Object.values(importedDailyData).reduce((total, day) => {
+                            const totalDays = Object.keys(dailyData).length;
+                            const totalTasks = Object.values(dailyData).reduce((total, day) => {
                                 return total + (day.tasks ? day.tasks.length : 0);
                             }, 0);
                             showAlert(`✅ Data and settings replaced successfully!\n\nDays imported: ${totalDays}\nTotal tasks: ${totalTasks}`, 'Import Complete');
@@ -2792,6 +2796,7 @@
 
         function saveData() {
             try {
+                dailyData._lastModified = new Date().toISOString(); // Always update timestamp before saving
                 localStorage.setItem('weeklyTrackerData', JSON.stringify(dailyData));
                 localStorage.setItem('weeklyTrackerSettings', JSON.stringify({
                     weekStartDay: appSettings.weekStartDay,
@@ -2801,7 +2806,7 @@
                     autoSaveIntervalMinutes: appSettings.autoSaveIntervalMinutes,
                     enableConfetti: appSettings.enableConfetti
                 }));
-                console.log('✅ Data and settings saved to localStorage');
+                console.log('✅ Data and settings saved to localStorage with timestamp:', dailyData._lastModified);
             } catch (error) {
                 console.warn('❌ Failed to save to localStorage:', error);
             }
@@ -2809,33 +2814,57 @@
 
         function loadData() {
             try {
-                const savedDailyData = localStorage.getItem('weeklyTrackerData');
-                if (savedDailyData) {
-                    dailyData = JSON.parse(savedDailyData);
+                const savedDailyDataStr = localStorage.getItem('weeklyTrackerData');
+                if (savedDailyDataStr) {
+                    dailyData = JSON.parse(savedDailyDataStr);
+                    // Ensure _lastModified is present for existing data
+                    if (!dailyData._lastModified) {
+                        dailyData._lastModified = new Date(0).toISOString(); // Default to epoch if missing
+                        console.log('Set _lastModified for old dailyData format.');
+                    }
                     // For backward compatibility: if dailyData is old weeklyData format
-                    if (!Object.keys(dailyData).some(key => key.includes('-'))) { // Check for YYYY-MM-DD format
+                    if (!Object.keys(dailyData).some(key => key.includes('-')) && Object.keys(dailyData).some(key => key.startsWith('week_offset_'))) {
                         console.log('Converting saved dailyData from old weeklyData format...');
-                        let tempDailyData = {};
+                        let tempDailyData = { _lastModified: new Date().toISOString() }; // Initialize with timestamp
+                        const tempWeekStartDay = appSettings.weekStartDay !== undefined ? appSettings.weekStartDay : DEFAULT_APP_SETTINGS.weekStartDay;
+                        const tempGetWeekStartDate = (offset = 0) => {
+                            const today = new Date();
+                            const targetDay = new Date(today);
+                            const dayDiff = (today.getDay() - tempWeekStartDay + 7) % 7;
+                            targetDay.setDate(today.getDate() - dayDiff + (offset * 7));
+                            return targetDay;
+                        };
+
                         Object.keys(dailyData).forEach(weekKey => {
                             const weekOffsetMatch = weekKey.match(/week_offset_(-?\d+)/);
                             if (weekOffsetMatch) {
                                 const weekOffset = parseInt(weekOffsetMatch[1]);
-                                const weekStartDate = getWeekStartDate(weekOffset); // This uses temporary appSettings.weekStartDay (default 1)
+                                const weekStartDate = tempGetWeekStartDate(weekOffset);
+
                                 Object.keys(dailyData[weekKey]).forEach(dayName => {
                                     const dayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(dayName);
                                     const dayDate = new Date(weekStartDate);
                                     dayDate.setDate(weekStartDate.getDate() + dayIndex);
                                     const dateKey = formatDateKey(dayDate);
                                     tempDailyData[dateKey] = dailyData[weekKey][dayName];
+                                    // Ensure tasks in old format have createdAt if missing, for LWW
+                                    if (tempDailyData[dateKey].tasks) {
+                                        tempDailyData[dateKey].tasks.forEach(task => {
+                                            if (!task.createdAt) {
+                                                task.createdAt = new Date().toISOString(); // Set a default createdAt if missing
+                                            }
+                                        });
+                                    }
                                 });
                             }
                         });
                         dailyData = tempDailyData;
-                        saveData(); // Resave in new format
+                        saveData(); // Resave in new format to include _lastModified and new structure
                     }
+                    console.log('✅ DailyData loaded from localStorage with timestamp:', dailyData._lastModified);
                 } else {
-                    dailyData = {};
-                    console.log('ℹ️ No saved dailyData found, starting fresh dailyData');
+                    dailyData = { _lastModified: new Date().toISOString() }; // Initialize with timestamp for new user
+                    console.log('ℹ️ No saved dailyData found, starting fresh dailyData with timestamp');
                 }
 
                 const savedSettings = localStorage.getItem('weeklyTrackerSettings');
@@ -2875,7 +2904,7 @@
             } catch (error) {
                 console.warn('❌ Failed to load data or settings from localStorage:', error);
                 // Fallback to defaults if loading fails
-                dailyData = {};
+                dailyData = { _lastModified: new Date().toISOString() }; // Initialize with timestamp
                 appSettings = JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS));
                 document.getElementById('weekStartDay').value = appSettings.weekStartDay;
                 document.getElementById('focusViewToggle').checked = appSettings.isFocusView;
@@ -2915,7 +2944,10 @@
             syncStatusElement = document.getElementById('syncStatus');
             syncToastElement = document.getElementById('syncToast');
 
-            loadData();
+            // Load settings first, as dailyData conversion in loadData might depend on appSettings.weekStartDay
+            // Also, appSettings is needed for renderSettings()
+            loadData(); // This now correctly loads both dailyData and appSettings
+
             updateWeekDisplay();
             generateDays();
             updateProgress();
@@ -2925,7 +2957,7 @@
 
             window.addEventListener('beforeunload', function () {
                 cleanupTimers();
-                saveData();
+                saveData(); // Ensure final save on close
                 if (peerConnection) {
                     peerConnection.close();
                 }
