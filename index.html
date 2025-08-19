@@ -18,7 +18,7 @@
     <meta name="twitter:description"
         content="A local-first, privacy-friendly weekly task tracker to plan and reflect on your work intensity.">
     <meta name="twitter:image"
-        content="https://media.istockphoto.com/id/1317983109/vector/project-tracking-goal-tracker-task-completion-or-checklist-to-remind-project-progress.jpg?s=612x612&w=0&k=20&c=Icl4grxyosadqnGxVUlwCmUOgZ2_qsF0YzLjBNQwSSs=">
+        content="https://media.istockphoto.com/id/1317983109/vector/project-tracking-goal-tracker-task-completion-or-checklist-to-remind-project-progress.jpg?s=612x612&w=0&k=20&c=Icl4grxyosadqnGwVUlwCmUOgZ2_qsF0YzLjBNQwSSs=">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
     </link>
@@ -221,7 +221,8 @@
         }
 
         .export-section,
-        .sync-section {
+        .sync-section,
+        .settings-btn-section {
             text-align: center;
             margin-top: 20px;
             padding-top: 20px;
@@ -783,9 +784,7 @@
             padding-top: 20px;
             border-top: 2px solid #e2e8f0;
             background: white;
-            border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -1026,6 +1025,215 @@
                 min-width: unset;
             }
         }
+
+        /* New CSS for Settings Panel */
+        .settings-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-left: 20px;
+            /* Space from toggle */
+        }
+
+        .settings-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .settings-panel {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            display: none;
+            /* Hidden by default */
+            animation: fadeIn 0.5s ease-out;
+            /* Simple fade in */
+        }
+
+        .settings-panel.open {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .settings-panel h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .settings-section h4 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            padding-left: 10px;
+        }
+
+        .day-config-item {
+            display: grid;
+            grid-template-columns: 120px 1fr 2fr;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .day-config-item {
+                grid-template-columns: 1fr;
+                /* Stack on very small screens */
+            }
+
+            .day-config-item label {
+                width: 100%;
+                /* Full width for label when stacked */
+                margin-bottom: 5px;
+            }
+        }
+
+        .day-config-item label {
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .day-config-item select,
+        .day-config-item input[type="text"],
+        .setting-option input[type="number"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #cbd5e0;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .day-config-item select {
+            /* Specific style for select tag */
+            padding-right: 30px;
+            /* Add space for chevron */
+            -webkit-appearance: none;
+            /* Remove default arrow on WebKit browsers */
+            -moz-appearance: none;
+            /* Remove default arrow on Firefox */
+            appearance: none;
+            /* Remove default arrow */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' d='M0 0h24v24H0V0z'/%3E%3Cpath d='M7 10l5 5 5-5H7z' fill='%23667eea'/%3E%3C/svg%3E");
+            /* Custom SVG arrow */
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 16px;
+        }
+
+
+        .motivational-message-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .motivational-message-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            background: #edf2f7;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .motivational-message-item button {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: background-color 0.2s ease;
+        }
+
+        .motivational-message-item button:hover {
+            background: #c53030;
+        }
+
+        .add-message-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .add-message-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #cbd5e0;
+            border-radius: 5px;
+        }
+
+        .add-message-input button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .setting-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 8px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .setting-option label {
+            color: #2d3748;
+            font-weight: bold;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .setting-option input[type="number"],
+        .setting-option input[type="checkbox"] {
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
     </style>
     <script>
         window.va = window.va || function () {
@@ -1160,8 +1368,53 @@
                 <p class="sync-status" id="syncStatus">Status: Not connected</p>
             </div>
             <!-- End New Sync Section -->
+            <div class="settings-btn-section" style="text-align: center; margin-top: 20px;">
+                <button class="settings-btn" onclick="toggleSettingsPanel()">⚙️ Toggle App Settings</button>
+            </div>
+        </div>
+
+        <!-- New Settings Panel -->
+        <div class="settings-panel" id="settingsPanel">
+            <h3>⚙️ App Settings Panel</h3>
+
+            <div class="settings-section">
+                <h4>Day Customization</h4>
+                <div id="dayConfigsSettings">
+                    <!-- Day settings will be rendered here -->
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h4>Motivational Messages</h4>
+                <ul id="motivationalMessageList" class="motivational-message-list">
+                    <!-- Messages will be rendered here -->
+                </ul>
+                <div class="add-message-input">
+                    <input type="text" id="newMotivationalMessage" placeholder="Add a new message...">
+                    <button onclick="addMotivationalMessage()">Add</button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h4>App Behavior</h4>
+                <div class="setting-option">
+                    <label for="autoSaveInterval">Auto-Save Interval (minutes):</label>
+                    <input type="number" id="autoSaveInterval" min="1" value="2"
+                        onchange="updateSetting('autoSaveIntervalMinutes', this.value)">
+                </div>
+                <div class="setting-option">
+                    <label for="enableConfetti">Enable Confetti on Completion:</label>
+                    <input type="checkbox" id="enableConfetti" onchange="updateSetting('enableConfetti', this.checked)">
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="reset-btn" onclick="resetSettingsConfirmation()">Reset All Settings</button>
+            </div>
 
         </div>
+        <!-- End Settings Panel -->
+
     </div>
 
     <div class="footer">
@@ -1181,9 +1434,6 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="syncToast" class="sync-toast"></div>
-
     <!-- Custom Modal for Confirmation/Alerts -->
     <div id="customModal" class="modal">
         <div class="modal-content">
@@ -1196,11 +1446,45 @@
         </div>
     </div>
 
+    <!-- Toast Notification Element -->
+    <div id="syncToast" class="sync-toast"></div>
+
     <script>
+        // --- Constants for Default Settings ---
+        const DEFAULT_DAY_CONFIGS = {
+            'Monday': { difficulty: 'hard', description: 'Hard Activities' },
+            'Tuesday': { difficulty: 'hard', description: 'Hard Acticities' },
+            'Wednesday': { difficulty: 'medium', description: 'Medium Level Activities' },
+            'Thursday': { difficulty: 'easy', description: 'Light Work' },
+            'Friday': { difficulty: 'chill', description: 'Chill Day' },
+            'Saturday': { difficulty: 'medium', description: 'Medium Level Activities' },
+            'Sunday': { difficulty: 'medium', description: 'Medium Level Activities' }
+        };
+
+        const DEFAULT_MOTIVATIONAL_MESSAGES = [
+            "Every expert was once a beginner. Keep going! 🌟",
+            "Consistency is the mother of mastery! 💪",
+            "You're building something amazing, one day at a time! 🚀",
+            "Progress, not perfection. You're doing great! ✨",
+            "Small steps daily lead to big changes yearly! 🎯",
+            "Your future self will thank you for today's effort! 🙏",
+            "Champions are made in the daily grind! 🏆",
+            "Discipline is choosing between what you want now and what you want most! 💎"
+        ];
+
+        const DEFAULT_APP_SETTINGS = {
+            weekStartDay: 1, // Monday
+            isFocusView: false,
+            dayConfigs: JSON.parse(JSON.stringify(DEFAULT_DAY_CONFIGS)), // Deep copy defaults
+            motivationalMessages: [...DEFAULT_MOTIVATIONAL_MESSAGES], // Copy defaults
+            autoSaveIntervalMinutes: 2,
+            enableConfetti: true
+        };
+
+        // --- Global Variables ---
         let dailyData = {};
         let currentWeekOffset = 0;
-        let weekStartDay = 1;
-        let isFocusView = false;
+        let appSettings = {}; // This will hold the active settings
 
         let saveTimeout = null;
         let autoSaveInterval = null;
@@ -1210,7 +1494,7 @@
         let dataChannel = null;
         let isOfferer = false; // To distinguish between the initiator and receiver
         let syncStatusElement = null;
-        let syncToastElement = null; // New element for toast notifications
+        let syncToastElement = null;
 
         // STUN servers for NAT traversal (no backend needed, just public servers)
         const iceServers = [
@@ -1219,27 +1503,6 @@
             { urls: 'stun:stun2.l.google.com:19302' },
             { urls: 'stun:stun3.l.google.com:19302' },
             { urls: 'stun:stun4.l.google.com:19302' }
-        ];
-
-        const dayConfigs = {
-            'Monday': { difficulty: 'hard', description: 'DSA & Core SWE Learning' },
-            'Tuesday': { difficulty: 'hard', description: 'DSA & Core SWE Learning' },
-            'Wednesday': { difficulty: 'medium', description: 'Medium Level Activities' },
-            'Thursday': { difficulty: 'easy', description: 'Light Work' },
-            'Friday': { difficulty: 'chill', description: 'Chill Day' },
-            'Saturday': { difficulty: 'medium', description: 'Medium Level Activities' },
-            'Sunday': { difficulty: 'medium', description: 'Medium Level Activities' }
-        };
-
-        const motivationalMessages = [
-            "Every expert was once a beginner. Keep going! 🌟",
-            "Consistency is the mother of mastery! 💪",
-            "You're building something amazing, one day at a time! 🚀",
-            "Progress, not perfection. You're doing great! ✨",
-            "Small steps daily lead to big changes yearly! 🎯",
-            "Your future self will thank you for today's effort! 🙏",
-            "Champions are made in the daily grind! 🏆",
-            "Discipline is choosing between what you want now and what you want most! 💎"
         ];
 
         // --- Custom Modal Functions (replaces alert/confirm) ---
@@ -1301,6 +1564,123 @@
             toastTimeout = setTimeout(() => {
                 syncToastElement.classList.remove('show');
             }, duration);
+        }
+
+        // --- Settings Panel Functions ---
+        function toggleSettingsPanel() {
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('open');
+            if (panel.classList.contains('open')) {
+                renderSettings(); // Re-render settings when opening
+            }
+        }
+
+        function renderSettings() {
+            renderDayConfigsSettings();
+            renderMotivationalMessagesSettings();
+            document.getElementById('autoSaveInterval').value = appSettings.autoSaveIntervalMinutes;
+            document.getElementById('enableConfetti').checked = appSettings.enableConfetti;
+        }
+
+        function renderDayConfigsSettings() {
+            const container = document.getElementById('dayConfigsSettings');
+            container.innerHTML = '';
+            const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const difficulties = ['hard', 'medium', 'easy', 'chill'];
+
+            daysOrder.forEach(dayName => {
+                const config = appSettings.dayConfigs[dayName];
+                const item = document.createElement('div');
+                item.className = 'day-config-item';
+                item.innerHTML = `
+                    <label>${dayName}:</label>
+                    <select onchange="updateDayConfig('${dayName}', 'difficulty', this.value)">
+                        ${difficulties.map(d => `<option value="${d}" ${config.difficulty === d ? 'selected' : ''}>${d.charAt(0).toUpperCase() + d.slice(1)}</option>`).join('')}
+                    </select>
+                    <input type="text" value="${config.description}" onchange="updateDayConfig('${dayName}', 'description', this.value)" placeholder="Description for ${dayName}">
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function updateDayConfig(dayName, key, value) {
+            appSettings.dayConfigs[dayName][key] = value;
+            optimizedSave();
+            generateDays(); // Re-render days to apply new configurations
+            updateProgress(); // Update progress bar as difficulty might change perception
+            showToast(`Updated ${dayName}'s ${key}.`, 'info', 1500);
+        }
+
+        function renderMotivationalMessagesSettings() {
+            const list = document.getElementById('motivationalMessageList');
+            list.innerHTML = '';
+            appSettings.motivationalMessages.forEach((message, index) => {
+                const item = document.createElement('li');
+                item.className = 'motivational-message-item';
+                item.innerHTML = `
+                    <span>${message}</span>
+                    <button onclick="removeMotivationalMessage(${index})">Remove</button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function addMotivationalMessage() {
+            const input = document.getElementById('newMotivationalMessage');
+            const message = input.value.trim();
+            if (message) {
+                appSettings.motivationalMessages.push(message);
+                input.value = '';
+                optimizedSave();
+                renderMotivationalMessagesSettings(); // Re-render list
+                updateProgress(); // Message in progress section might change
+                showToast('Motivational message added!', 'success', 1500);
+            }
+        }
+
+        function removeMotivationalMessage(index) {
+            appSettings.motivationalMessages.splice(index, 1);
+            optimizedSave();
+            renderMotivationalMessagesSettings(); // Re-render list
+            updateProgress(); // Message in progress section might change
+            showToast('Motivational message removed.', 'info', 1500);
+        }
+
+        function updateSetting(key, value) {
+            if (key === 'autoSaveIntervalMinutes') {
+                const numValue = parseInt(value);
+                if (!isNaN(numValue) && numValue >= 1) {
+                    appSettings[key] = numValue;
+                    setupAutoSave(); // Restart auto-save with new interval
+                    showToast(`Auto-save interval set to ${numValue} minutes.`, 'success', 1500);
+                } else {
+                    showAlert('Auto-save interval must be a number greater than or equal to 1.', 'Invalid Input');
+                    document.getElementById(key).value = appSettings[key]; // Revert input
+                }
+            } else if (key === 'enableConfetti') {
+                appSettings[key] = value;
+                showToast(`Confetti ${value ? 'enabled' : 'disabled'}.`, 'info', 1500);
+            }
+            optimizedSave();
+        }
+
+        function resetSettingsConfirmation() {
+            showConfirmation(
+                'Are you sure you want to reset ALL app settings to their default values?\n\n' +
+                'This includes day customizations, motivational messages, auto-save interval, and confetti settings. Your task data will NOT be affected.',
+                () => { // onConfirm
+                    // Reset appSettings to a deep copy of defaults
+                    appSettings = JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS));
+                    optimizedSave(); // Save reset settings
+                    renderSettings(); // Re-render settings UI
+                    updateWeekDisplay(); // If week start day was reset
+                    generateDays(); // If day configs were reset
+                    updateProgress(); // If motivational messages were reset
+                    setupAutoSave(); // Apply default auto-save interval
+                    showToast('All settings have been reset to default.', 'success');
+                },
+                () => { } // onCancel
+            );
         }
 
         // --- WebRTC Sync UI State Management ---
@@ -1666,6 +2046,7 @@
         // --- Original App Functions (with modifications for sync) ---
 
         function createConfetti() {
+            if (!appSettings.enableConfetti) return; // Check if confetti is enabled
             const colors = ['#667eea', '#764ba2', '#48bb78', '#4299e1', '#e53e3e', '#dd6b20', '#38a169', '#3182ce'];
             const confettiCount = 50;
 
@@ -1735,7 +2116,7 @@
             const today = new Date();
             const targetDay = new Date(today);
 
-            const dayDiff = (today.getDay() - weekStartDay + 7) % 7;
+            const dayDiff = (today.getDay() - appSettings.weekStartDay + 7) % 7;
             targetDay.setDate(today.getDate() - dayDiff + (offset * 7));
 
             return targetDay;
@@ -1746,7 +2127,7 @@
             const orderedDays = [];
 
             for (let i = 0; i < 7; i++) {
-                orderedDays.push(days[(weekStartDay + i) % 7]);
+                orderedDays.push(days[(appSettings.weekStartDay + i) % 7]);
             }
 
             return orderedDays;
@@ -1779,7 +2160,7 @@
         }
 
         function toggleView() {
-            isFocusView = document.getElementById('focusViewToggle').checked;
+            appSettings.isFocusView = document.getElementById('focusViewToggle').checked;
             updateViewLabel();
             generateDays();
             optimizedSave();
@@ -1787,11 +2168,11 @@
 
         function updateViewLabel() {
             const label = document.getElementById('viewLabel');
-            label.textContent = isFocusView ? 'Focus View' : 'Week View';
+            label.textContent = appSettings.isFocusView ? 'Focus View' : 'Week View';
         }
 
         function changeWeekStart() {
-            weekStartDay = parseInt(document.getElementById('weekStartDay').value);
+            appSettings.weekStartDay = parseInt(document.getElementById('weekStartDay').value);
             updateWeekDisplay();
             generateDays();
             updateProgress();
@@ -1827,7 +2208,7 @@
             const focusModePlaceholder = document.getElementById('focusModePlaceholder');
             const weekNav = document.getElementById('weekNav');
 
-            if (isFocusView) {
+            if (appSettings.isFocusView) {
                 weekStartSelector.style.display = 'none';
                 focusModePlaceholder.style.display = 'flex';
                 weekNav.style.display = 'none';
@@ -1837,11 +2218,11 @@
                 weekNav.style.display = 'flex';
             }
 
-            const dates = isFocusView ? getFocusViewDates() : getWeekViewDates();
+            const dates = appSettings.isFocusView ? getFocusViewDates() : getWeekViewDates();
 
             dates.forEach(date => {
                 const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-                const config = dayConfigs[dayName];
+                const config = appSettings.dayConfigs[dayName]; // Use appSettings.dayConfigs
                 const dayCard = createDayCard(date, dayName, config);
                 daysGrid.appendChild(dayCard);
             });
@@ -2170,7 +2551,7 @@
         }
 
         function updateProgress() {
-            const dates = isFocusView ? getFocusViewDates() : getWeekViewDates();
+            const dates = appSettings.isFocusView ? getFocusViewDates() : getWeekViewDates();
 
             let totalTasks = 0;
             let completedTasks = 0;
@@ -2203,9 +2584,9 @@
                 progressFill.textContent = '';
             }
 
-            const messageIndex = Math.min(Math.floor(completionRate / 12.5), motivationalMessages.length - 1);
+            const messageIndex = Math.min(Math.floor(completionRate / 12.5), appSettings.motivationalMessages.length - 1);
             document.getElementById('motivationalMessage').textContent =
-                motivationalMessages[messageIndex];
+                appSettings.motivationalMessages[messageIndex]; // Use appSettings.motivationalMessages
 
             const progressSection = document.querySelector('.progress-section');
             if (completionRate >= 80) {
@@ -2220,10 +2601,9 @@
             const originalText = exportButton.textContent;
 
             const exportData = {
-                version: "2.1", // Updated version for WebRTC integration
+                version: "2.2", // Updated version for WebRTC integration and settings
                 exportDate: new Date().toISOString(),
-                weekStartDay: weekStartDay,
-                isFocusView: isFocusView,
+                appSettings: appSettings, // Export all app settings
                 dailyData: dailyData,
                 metadata: {
                     totalDays: Object.keys(dailyData).length,
@@ -2267,18 +2647,19 @@
                         () => { // onConfirm final
                             try {
                                 dailyData = {};
-                                weekStartDay = 1;
-                                currentWeekOffset = 0;
-                                isFocusView = false;
+                                // Reset app settings to defaults
+                                appSettings = JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS));
 
                                 localStorage.removeItem('weeklyTrackerData');
+                                localStorage.removeItem('weeklyTrackerSettings'); // Also remove settings
 
-                                document.getElementById('weekStartDay').value = weekStartDay;
-                                document.getElementById('focusViewToggle').checked = false;
+                                document.getElementById('weekStartDay').value = appSettings.weekStartDay;
+                                document.getElementById('focusViewToggle').checked = appSettings.isFocusView;
                                 updateViewLabel();
                                 updateWeekDisplay();
                                 generateDays();
                                 updateProgress();
+                                setupAutoSave(); // Apply default interval
 
                                 showAlert('✅ All data has been reset successfully!\n\nYou can start fresh with your weekly tracking.', 'Data Reset');
 
@@ -2302,60 +2683,73 @@
             const reader = new FileReader();
             reader.onload = function (e) {
                 try {
-                    const importedData = JSON.parse(e.target.result);
+                    const importedRawData = JSON.parse(e.target.result);
+                    let importedDailyData = {};
+                    let importedAppSettings = {};
 
-                    let dataToImport = {};
+                    if (importedRawData.version && importedRawData.version === "2.2") {
+                        // New format (with appSettings)
+                        importedDailyData = importedRawData.dailyData || {};
+                        importedAppSettings = importedRawData.appSettings || {};
+                    } else if (importedRawData.dailyData) {
+                        // Version 2.1 format (with dailyData, but no explicit appSettings)
+                        importedDailyData = importedRawData.dailyData;
+                        importedAppSettings.weekStartDay = importedRawData.weekStartDay;
+                        importedAppSettings.isFocusView = importedRawData.isFocusView;
+                        // Default other settings for older versions
+                        importedAppSettings.dayConfigs = JSON.parse(JSON.stringify(DEFAULT_DAY_CONFIGS));
+                        importedAppSettings.motivationalMessages = [...DEFAULT_MOTIVATIONAL_MESSAGES];
+                        importedAppSettings.autoSaveIntervalMinutes = DEFAULT_APP_SETTINGS.autoSaveIntervalMinutes;
+                        importedAppSettings.enableConfetti = DEFAULT_APP_SETTINGS.enableConfetti;
 
-                    if (importedData.dailyData) {
-                        dataToImport = importedData.dailyData;
-                    } else if (importedData.weeklyData) {
+                    } else if (importedRawData.weeklyData) {
+                        // Old format (version 2.0 or earlier)
                         console.log('Converting old data format to new date-based format...');
-
-                        Object.keys(importedData.weeklyData).forEach(weekKey => {
+                        Object.keys(importedRawData.weeklyData).forEach(weekKey => {
                             const weekOffset = parseInt(weekKey.split('_')[1]);
-                            const weekStartDate = getWeekStartDate(weekOffset);
+                            const weekStartDate = getWeekStartDate(weekOffset); // This uses existing appSettings.weekStartDay
 
-                            Object.keys(importedData.weeklyData[weekKey]).forEach(dayName => {
+                            Object.keys(importedRawData.weeklyData[weekKey]).forEach(dayName => {
                                 const dayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(dayName);
                                 const dayDate = new Date(weekStartDate);
                                 dayDate.setDate(weekStartDate.getDate() + dayIndex);
                                 const dateKey = formatDateKey(dayDate);
 
-                                dataToImport[dateKey] = importedData.weeklyData[weekKey][dayName];
+                                importedDailyData[dateKey] = importedRawData.weeklyData[weekKey][dayName];
                             });
                         });
+                        // Default app settings for very old versions
+                        importedAppSettings = JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS));
+
                     } else {
-                        throw new Error('Invalid data format - no dailyData or weeklyData found');
+                        throw new Error('Invalid data format - no recognized data structure found');
                     }
 
-                    showConfirmation('Do you want to merge with existing data? Click "OK" to merge, or "Cancel" to replace all data.',
+                    showConfirmation('Do you want to merge with existing data? Click "OK" to merge, or "Cancel" to replace all data and settings.',
                         () => { // On Confirm (merge)
-                            mergeDailyData(dataToImport); // Use the dedicated merge function
-                            const totalDays = Object.keys(dataToImport).length;
-                            const totalTasks = Object.values(dataToImport).reduce((total, day) => {
+                            mergeDailyData(importedDailyData); // Use the dedicated merge function for dailyData
+                            // Merge settings (simple override for now, can be more granular if needed)
+                            Object.assign(appSettings, importedAppSettings);
+                            optimizedSave();
+                            updateAppSettingsUI(); // Update settings panel UI
+                            setupAutoSave(); // Apply new auto-save interval
+                            const totalDays = Object.keys(importedDailyData).length;
+                            const totalTasks = Object.values(importedDailyData).reduce((total, day) => {
                                 return total + (day.tasks ? day.tasks.length : 0);
                             }, 0);
-                            showAlert(`✅ Data merged successfully!\n\nDays imported: ${totalDays}\nTotal tasks: ${totalTasks}`, 'Import Complete');
+                            showAlert(`✅ Data and settings merged successfully!\n\nDays imported: ${totalDays}\nTotal tasks: ${totalTasks}`, 'Import Complete');
                         },
                         () => { // On Cancel (replace)
-                            dailyData = dataToImport;
-                            if (importedData.weekStartDay !== undefined) {
-                                weekStartDay = importedData.weekStartDay;
-                                document.getElementById('weekStartDay').value = weekStartDay;
-                            }
-                            if (importedData.isFocusView !== undefined) {
-                                isFocusView = importedData.isFocusView;
-                                document.getElementById('focusViewToggle').checked = isFocusView;
-                                updateViewLabel();
-                            }
-                            generateDays();
-                            updateProgress();
+                            dailyData = importedDailyData;
+                            appSettings = importedAppSettings; // Replace all app settings
                             optimizedSave();
-                            const totalDays = Object.keys(dataToImport).length;
-                            const totalTasks = Object.values(dataToImport).reduce((total, day) => {
+                            updateAppSettingsUI(); // Update settings panel UI
+                            setupAutoSave(); // Apply new auto-save interval
+                            const totalDays = Object.keys(importedDailyData).length;
+                            const totalTasks = Object.values(importedDailyData).reduce((total, day) => {
                                 return total + (day.tasks ? day.tasks.length : 0);
                             }, 0);
-                            showAlert(`✅ Data replaced successfully!\n\nDays imported: ${totalDays}\nTotal tasks: ${totalTasks}`, 'Import Complete');
+                            showAlert(`✅ Data and settings replaced successfully!\n\nDays imported: ${totalDays}\nTotal tasks: ${totalTasks}`, 'Import Complete');
                         },
                         'Import Options'
                     );
@@ -2371,6 +2765,21 @@
             reader.readAsText(file);
         }
 
+        // Helper to update app UI elements based on appSettings
+        function updateAppSettingsUI() {
+            document.getElementById('weekStartDay').value = appSettings.weekStartDay;
+            document.getElementById('focusViewToggle').checked = appSettings.isFocusView;
+            updateViewLabel();
+            updateWeekDisplay();
+            generateDays();
+            updateProgress();
+            // Also update settings panel if it's open
+            if (document.getElementById('settingsPanel').classList.contains('open')) {
+                renderSettings();
+            }
+        }
+
+
         function optimizedSave() {
             if (saveTimeout) {
                 clearTimeout(saveTimeout);
@@ -2383,14 +2792,16 @@
 
         function saveData() {
             try {
-                const dataToSave = {
-                    dailyData: dailyData,
-                    weekStartDay: weekStartDay,
-                    isFocusView: isFocusView,
-                    lastSaved: new Date().toISOString()
-                };
-                localStorage.setItem('weeklyTrackerData', JSON.stringify(dataToSave));
-                console.log('✅ Data saved to localStorage');
+                localStorage.setItem('weeklyTrackerData', JSON.stringify(dailyData));
+                localStorage.setItem('weeklyTrackerSettings', JSON.stringify({
+                    weekStartDay: appSettings.weekStartDay,
+                    isFocusView: appSettings.isFocusView,
+                    dayConfigs: appSettings.dayConfigs,
+                    motivationalMessages: appSettings.motivationalMessages,
+                    autoSaveIntervalMinutes: appSettings.autoSaveIntervalMinutes,
+                    enableConfetti: appSettings.enableConfetti
+                }));
+                console.log('✅ Data and settings saved to localStorage');
             } catch (error) {
                 console.warn('❌ Failed to save to localStorage:', error);
             }
@@ -2398,54 +2809,77 @@
 
         function loadData() {
             try {
-                const savedData = localStorage.getItem('weeklyTrackerData');
-                if (savedData) {
-                    const parsedData = JSON.parse(savedData);
-
-                    if (parsedData.dailyData) {
-                        dailyData = parsedData.dailyData || {};
-                    } else if (parsedData.weeklyData) {
-                        console.log('Converting saved data from old format to new date-based format...');
-                        dailyData = {};
-
-                        Object.keys(parsedData.weeklyData).forEach(weekKey => {
-                            const weekOffset = parseInt(weekKey.split('_')[1]);
-                            const weekStartDate = getWeekStartDate(weekOffset);
-
-                            Object.keys(parsedData.weeklyData[weekKey]).forEach(dayName => {
-                                const dayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(dayName);
-                                const dayDate = new Date(weekStartDate);
-                                dayDate.setDate(weekStartDate.getDate() + dayIndex);
-                                const dateKey = formatDateKey(dayDate);
-
-                                dailyData[dateKey] = parsedData.weeklyData[weekKey][dayName];
-                            });
+                const savedDailyData = localStorage.getItem('weeklyTrackerData');
+                if (savedDailyData) {
+                    dailyData = JSON.parse(savedDailyData);
+                    // For backward compatibility: if dailyData is old weeklyData format
+                    if (!Object.keys(dailyData).some(key => key.includes('-'))) { // Check for YYYY-MM-DD format
+                        console.log('Converting saved dailyData from old weeklyData format...');
+                        let tempDailyData = {};
+                        Object.keys(dailyData).forEach(weekKey => {
+                            const weekOffsetMatch = weekKey.match(/week_offset_(-?\d+)/);
+                            if (weekOffsetMatch) {
+                                const weekOffset = parseInt(weekOffsetMatch[1]);
+                                const weekStartDate = getWeekStartDate(weekOffset); // This uses temporary appSettings.weekStartDay (default 1)
+                                Object.keys(dailyData[weekKey]).forEach(dayName => {
+                                    const dayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(dayName);
+                                    const dayDate = new Date(weekStartDate);
+                                    dayDate.setDate(weekStartDate.getDate() + dayIndex);
+                                    const dateKey = formatDateKey(dayDate);
+                                    tempDailyData[dateKey] = dailyData[weekKey][dayName];
+                                });
+                            }
                         });
-
-                        saveData(); // Save in new format
-                    } else {
-                        dailyData = {};
+                        dailyData = tempDailyData;
+                        saveData(); // Resave in new format
                     }
-
-                    weekStartDay = parsedData.weekStartDay || 1;
-                    isFocusView = parsedData.isFocusView || false;
-
-                    document.getElementById('weekStartDay').value = weekStartDay;
-                    document.getElementById('focusViewToggle').checked = isFocusView;
-                    updateViewLabel();
-
-                    console.log('✅ Data loaded from localStorage');
                 } else {
-                    console.log('ℹ️ No saved data found, starting fresh');
                     dailyData = {};
-                    weekStartDay = 1;
-                    isFocusView = false;
+                    console.log('ℹ️ No saved dailyData found, starting fresh dailyData');
                 }
+
+                const savedSettings = localStorage.getItem('weeklyTrackerSettings');
+                if (savedSettings) {
+                    const parsedSettings = JSON.parse(savedSettings);
+                    // Start with default settings, then apply saved overrides
+                    appSettings = JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS)); // Deep copy defaults
+
+                    appSettings.weekStartDay = parsedSettings.weekStartDay !== undefined ? parsedSettings.weekStartDay : DEFAULT_APP_SETTINGS.weekStartDay;
+                    appSettings.isFocusView = parsedSettings.isFocusView !== undefined ? parsedSettings.isFocusView : DEFAULT_APP_SETTINGS.isFocusView;
+                    appSettings.autoSaveIntervalMinutes = parsedSettings.autoSaveIntervalMinutes !== undefined ? parsedSettings.autoSaveIntervalMinutes : DEFAULT_APP_SETTINGS.autoSaveIntervalMinutes;
+                    appSettings.enableConfetti = parsedSettings.enableConfetti !== undefined ? parsedSettings.enableConfetti : DEFAULT_APP_SETTINGS.enableConfetti;
+
+                    // Merge day configs: start with defaults, then apply saved custom ones
+                    if (parsedSettings.dayConfigs) {
+                        for (const day in parsedSettings.dayConfigs) {
+                            if (appSettings.dayConfigs[day]) { // Only merge for known days
+                                Object.assign(appSettings.dayConfigs[day], parsedSettings.dayConfigs[day]);
+                            }
+                        }
+                    }
+                    // For motivational messages, simply replace if saved and valid, otherwise use default.
+                    appSettings.motivationalMessages = parsedSettings.motivationalMessages && Array.isArray(parsedSettings.motivationalMessages) && parsedSettings.motivationalMessages.length > 0
+                        ? parsedSettings.motivationalMessages : [...DEFAULT_MOTIVATIONAL_MESSAGES];
+
+                    console.log('✅ Settings loaded from localStorage');
+                } else {
+                    appSettings = JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS)); // Initialize with defaults
+                    console.log('ℹ️ No saved settings found, starting fresh settings');
+                }
+
+                // Update UI based on loaded settings
+                document.getElementById('weekStartDay').value = appSettings.weekStartDay;
+                document.getElementById('focusViewToggle').checked = appSettings.isFocusView;
+                updateViewLabel();
+
             } catch (error) {
-                console.warn('❌ Failed to load from localStorage:', error);
+                console.warn('❌ Failed to load data or settings from localStorage:', error);
+                // Fallback to defaults if loading fails
                 dailyData = {};
-                weekStartDay = 1;
-                isFocusView = false;
+                appSettings = JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS));
+                document.getElementById('weekStartDay').value = appSettings.weekStartDay;
+                document.getElementById('focusViewToggle').checked = appSettings.isFocusView;
+                updateViewLabel();
             }
         }
 
@@ -2453,7 +2887,10 @@
             if (autoSaveInterval) {
                 clearInterval(autoSaveInterval);
             }
-            autoSaveInterval = setInterval(saveData, 120000); // Save every 2 minutes
+            // Convert minutes to milliseconds for setInterval
+            const intervalMs = appSettings.autoSaveIntervalMinutes * 60 * 1000;
+            autoSaveInterval = setInterval(saveData, intervalMs);
+            console.log(`Auto-save set to every ${appSettings.autoSaveIntervalMinutes} minutes.`);
         }
 
         function cleanupTimers() {
@@ -2475,8 +2912,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            syncStatusElement = document.getElementById('syncStatus'); // Initialize sync status element
-            syncToastElement = document.getElementById('syncToast'); // Initialize toast element
+            syncStatusElement = document.getElementById('syncStatus');
+            syncToastElement = document.getElementById('syncToast');
 
             loadData();
             updateWeekDisplay();
@@ -2490,7 +2927,7 @@
                 cleanupTimers();
                 saveData();
                 if (peerConnection) {
-                    peerConnection.close(); // Close WebRTC connection on unload
+                    peerConnection.close();
                 }
             });
 
