@@ -1,3 +1,5 @@
+<img width="1500" height="500" alt="weekly-work_tracker" src="https://github.com/user-attachments/assets/f8058812-5210-4fa5-a688-a5dd46e50723" />
+
 <img width="3672" height="1837" alt="screen-1" src="https://github.com/user-attachments/assets/95407c6c-14c6-40e7-8986-87029d333a6b" />
 
 # **🎯 Weekly Work (Progress) Tracker**
@@ -167,4 +169,4 @@ MIT License – Feel free to use, share, and modify.
 <img width="3672" height="1837" alt="screen-1" src="https://github.com/user-attachments/assets/95407c6c-14c6-40e7-8986-87029d333a6b" />
 <img width="3638" height="1787" alt="screen-2" src="https://github.com/user-attachments/assets/ca6bacfa-37ed-48b8-87de-e8bbe4e51ef6" />
 
-(PS - The snapshots need to be updated; they’re old.)
+PS - Snapshots are not up-to-date. Please check live app - [Weekly](https:weekly.technologypro.in)
