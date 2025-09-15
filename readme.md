@@ -1,64 +1,79 @@
-<img width="1500" height="500" alt="weekly-work_tracker" src="https://github.com/user-attachments/assets/f8058812-5210-4fa5-a688-a5dd46e50723" />
+<img width="2880" height="1702" alt="demo-weekly-1-focus" src="https://github.com/user-attachments/assets/436b6860-6b0a-4ae8-b988-11fe6907ddc3" />
 
-<img width="3672" height="1837" alt="screen-1" src="https://github.com/user-attachments/assets/95407c6c-14c6-40e7-8986-87029d333a6b" />
-
-# **🎯 Weekly Work (Progress) Tracker**
-[![Live Demo](https://img.shields.io/badge/Demo-View%20Now-4CAF50?style=for-the-badge)](https://weekly-work-tracker.vercel.app)
+# **🎯 Weekly Work Tracker: Your Privacy-First Productivity Partner**
+[![Buy on Gumroad](https://img.shields.io/badge/Buy_on_Gumroad-FF90E8?style=for-the-badge&logo=gumroad&logoColor=black)](https://pagarevijayy.gumroad.com/l/weekly-work-tracker)
+[![weekly.technologypro.in](https://img.shields.io/badge/weekly.technologypro.in-blue?style=for-the-badge)](https://weekly.technologypro.in)
 [![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-%E2%98%95-ffdd57?style=for-the-badge)](https://pagarevijayy.gumroad.com/coffee)
 
-A **local-first, privacy-friendly** weekly task tracker designed to help you stay consistent, productive, and goal-oriented. Your data is stored securely in your own browser, now with the added power of **peer-to-peer syncing** across your devices\!
+A **privacy-first** weekly task tracker that helps you stay consistent and productive.
 
-Plan your week, track your progress, keep your motivation high, and ensure your data is always up-to-date, wherever you are. This app is designed to be your indispensable companion for balancing deep work, continuous learning, and essential rest throughout your week.
+Your data is stored securely on your device and now **syncs seamlessly across all your devices** using peer-to-peer technology. No servers, no compromises.
+
+Plan your week, track your progress, and stay motivated. It's the perfect companion for balancing deep work, learning, and rest.
+
+<img width="1500" height="500" alt="weekly" src="https://github.com/user-attachments/assets/721fab7d-4cde-4a97-90e2-b3e0a0dd09d6" />
 
 ## **🧠 Overview**
 
-The Weekly Work Tracker is a responsive web app that empowers you to **track daily tasks** based on customizable difficulty levels. It's built to help you manage your week with a structured approach, allowing you to designate hard, medium, easy, and chill days. Whether you're dedicating Monday and Tuesday to intensive DSA and system design (hard days) or scheduling lighter work mid-week, this tool adapts to your flow.
+The **Weekly Work Tracker** is a privacy-first web app designed to help you plan your week with intention.
 
-With its new **WebRTC peer-to-peer synchronization**, your progress and personalized settings seamlessly follow you across multiple devices without ever touching a server, ensuring ultimate privacy and convenience. This is more than just a tracker; it's a commitment to your productivity, designed to keep you focused and motivated across all your work environments.
+It lets you define your days by **customizable difficulty levels** (hard, medium, easy, chill), so you can balance deep work with rest. Need to focus on a tough project on Monday and take it easy on Wednesday? This app adapts to you.
 
-## **🌟 Features**
+With new **WebRTC peer-to-peer sync**, your data stays on your devices—never on a server. Your tasks and settings are always up-to-date, from desktop to phone, ensuring **ultimate privacy and a seamless workflow**.
 
-* 📆 **Weekly Planning & Navigation**  
-  * Effortlessly navigate between past, current, and future weeks.  
-  * Set your preferred start day for the week (Monday–Sunday) to align with your personal or professional schedule.  
-* 🎯 **Focus View**  
-  * Toggle to a streamlined "Focus View" to concentrate solely on tasks for the current or upcoming days, minimizing distractions and enhancing immediate productivity.  
-* 🗂 **Dynamic Daily Task Cards**  
-  * Add, mark complete, or delete tasks with ease for each day.  
-  * Tasks are intuitively color-coded by customizable difficulty levels (hard, medium, easy, chill), providing a quick visual overview of your workload.  
-  * **Drag & Drop functionality**: Reorder tasks within a day or seamlessly move them between different days to adapt to changing priorities.  
-* 📊 **Intelligent Weekly Progress Summary**  
-  * Get instant feedback on your overall completion rate, total tasks, and completed tasks.  
-  * Track your "Perfect Day Streak" to stay motivated and celebrate consistent effort.  
-  * A vibrant, dynamic progress bar with a subtle "pulse" effect (for high completion rates) visually encourages you.  
-  * **Contextual Motivational Messages**: Receive encouraging messages that dynamically update based on your weekly progress, providing a constant source of inspiration.  
-* 🔗 **Seamless WebRTC Peer-to-Peer (P2P) Data Sync** (NEW\!)  
-  * **Serverless Synchronization**: Securely sync all your daily tasks and app settings between multiple devices (e.g., desktop to laptop, phone to tablet) directly, without any data ever being stored on external servers. Your privacy is paramount.  
-  * **Offer/Answer Code Exchange**: Initiate sync sessions easily by exchanging short, temporary codes between your devices.  
-  * **Real-time Updates**: Changes on one device are merged and reflected on connected devices, ensuring your data is always consistent.  
-* ⚙️ **Comprehensive App Settings Panel** (NEW\!)  
-  * **Day Customization**: Personalize the difficulty level (hard, medium, easy, chill) and add a custom description for each day of the week to perfectly match your workflow (e.g., "Wednesday: Brainstorming & Planning").  
-  * **Motivational Message Management**: Add new personalized motivational messages, or remove existing ones, to keep your inspiration tailored to you.  
-  * **Auto-Save Interval**: Adjust how frequently your data is automatically saved to local storage.  
-  * **Confetti on Completion**: Enable or disable celebratory confetti animations when you achieve significant task milestones.  
-* 💾 **Robust Data Export/Import**  
-  * Export your entire dataset, including all tasks and current app settings, as a JSON file for secure backups or manual transfers.  
-  * Import data effortlessly, with options to either merge with existing data (applying Last-Write-Wins for tasks) or completely replace your current data.  
-* 📱 **Fully Responsive & Offline-First Design**  
-  * Enjoy a consistent and optimized experience across all devices, from mobile phones to large desktop monitors.  
-  * The app works 100% offline after the initial load, meaning no internet connection is required for daily use.
+This isn't just a to-do list; it's a tool to help you work smarter and stay motivated, all while keeping your data private.
 
-## **💰 Why Consider Supporting This Project? (Value Proposition)**
+## 🌟 Features
 
-The Weekly Work Tracker goes beyond a basic to-do list, offering a unique blend of productivity, privacy, and seamless cross-device utility:
+#### 📆 Weekly Planning & Navigation
+* Easily move between past, present, and future weeks.
+* Customize your week's start day to fit your schedule.
 
-* **Uncompromised Privacy (Local-First & P2P Sync)**: In an age where almost every app demands your data, this tracker stands apart. Your tasks and progress remain entirely on your devices. The WebRTC P2P sync allows you to collaborate or keep your data synchronized without uploading it to any cloud server, making it ideal for sensitive planning or simply for those who value digital autonomy.  
-* **Enhanced Productivity & Motivation**: The customizable day difficulties, motivational messages, and real-time progress tracking are designed to keep you engaged and accountable. It's not just about listing tasks, but intelligently structuring your week to prevent burnout and maximize deep work.  
-* **Always Up-to-Date, Anywhere**: The new P2P sync means you can start planning on your desktop, update tasks on your phone during a commute, and reflect on your tablet in the evening—all with the latest data, no manual transfers needed, and no internet required after the initial sync handshake.  
-* **Zero Dependencies, Pure Performance**: Built with plain HTML, CSS, and JavaScript, the app is incredibly lightweight, fast, and reliable. There's no complex setup, no accounts to create, and no frameworks to slow you down.  
-* **Continuous Improvement**: Supporting this project enables ongoing development, new features, and refinement to make your productivity journey even smoother.
+#### 🎯 Focus View
+* Switch to a distraction-free view to see only today's or upcoming tasks.
 
-If you value privacy, seek a powerful yet simple productivity tool, and appreciate software that just works, then this tracker offers immense value. Your support helps ensure it remains a robust, independent, and user-centric solution.
+#### 🗂 Dynamic Daily Task Cards
+* Add, complete, or delete tasks effortlessly.
+* Tasks are color-coded by difficulty (**hard, medium, easy, chill**).
+* **Drag & Drop** tasks to reorder them or move them to different days.
+
+#### 📊 Intelligent Weekly Progress
+* Get instant stats on your completion rate and total tasks.
+* Track your **"Perfect Day Streak"** for motivation.
+* A vibrant progress bar and contextual messages keep you inspired.
+
+#### 🔗 Seamless WebRTC P2P Data Sync 
+* **Privacy-first sync:** Securely sync all data between devices without a server.
+* Connect devices by exchanging a simple, temporary code.
+* Real-time updates ensure your data is always consistent.
+
+#### ⚙️ Comprehensive App Settings
+* **Personalize days:** Customize daily difficulty and add descriptions.
+* **Manage motivation:** Add or remove your own inspirational messages.
+* Adjust auto-save intervals and confetti animations.
+
+#### 💾 Robust Data Export/Import
+* Export your entire dataset as a JSON file for secure backups.
+* Import data to either merge with or replace your current tasks.
+
+#### 📱 Fully Responsive & Offline-First
+* Enjoy a seamless experience on any device, from desktop to mobile.
+* The app works completely **offline** after the first load, so you never need an internet connection for daily use.
+
+## **💰 Want to support weekly?**
+
+[![Buy on Gumroad](https://img.shields.io/badge/Buy_on_Gumroad-FF90E8?style=for-the-badge&logo=gumroad&logoColor=black)](https://pagarevijayy.gumroad.com/l/weekly-work-tracker)
+
+#### What do you get:
+* **Ultimate Privacy:** Your data stays on your device—period. The app is local-first, ensuring your sensitive plans and tasks never touch a server.
+* **Seamless P2P Sync:** Thanks to new WebRTC peer-to-peer syncing, your progress and settings are always up-to-date across all your devices—from desktop to phone to tablet. No cloud, no accounts, no compromise on your privacy.
+* **Structured Planning:** Go beyond a simple to-do list. The tracker lets you define your week with custom difficulty levels (**hard, medium, easy, chill days**) to balance deep work, learning, and essential rest.
+* **Built-in Motivation:** Get real-time progress summaries, track your "**Perfect Day Streak**," and receive encouraging, customizable messages to keep your momentum high.
+* **Drag & Drop Simplicity:** Easily organize, reorder, and move tasks between days with an intuitive, responsive design.
+
+If you value digital autonomy and a tool that genuinely helps you work smarter without asking for your personal information, the Weekly Work Tracker is for you.
+
+
 
 ## **🚀 Getting Started**
 
@@ -155,18 +170,18 @@ No external frameworks or libraries are used for core functionality, ensuring a 
 
 ## **🙌 Credits & Support**
 
-Created with 💜 by Vijay Pagare.  
-Inspired by the need to balance deep work, learning, and restful time throughout the week.  
-If you found this useful and appreciate the privacy-first approach and the powerful new sync capabilities, consider sharing it or supporting my work:
+Created with 💜 by [Vijay Pagare](https://x.com/pagarevijayy). Inspired by the need to balance deep work, learning, and restful time throughout the week. If you found this useful and appreciate the privacy-first approach and the powerful new sync capabilities, consider sharing it or supporting my work:
 
-[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-%E2%98%95-ffdd57?style=for-the-badge)](https://pagarevijayy.gumroad.com/coffee)
+[![Buy on Gumroad](https://img.shields.io/badge/Buy_on_Gumroad-FF90E8?style=for-the-badge&logo=gumroad&logoColor=black)](https://pagarevijayy.gumroad.com/l/weekly-work-tracker)
 ## **📄 License**
 
 MIT License – Feel free to use, share, and modify.
 
-## **📸 Snapshots**
+## **📸 Preview**
+<img width="2880" height="1702" alt="demo-weekly-1-focus" src="https://github.com/user-attachments/assets/436b6860-6b0a-4ae8-b988-11fe6907ddc3" />
+<img width="2880" height="1702" alt="demo-weekly-1-week" src="https://github.com/user-attachments/assets/10abd5bc-5a4d-4ec8-8d14-9cbf81564d75" />
+<img width="2880" height="1702" alt="demo-weekly-2" src="https://github.com/user-attachments/assets/38be2e97-b0fa-463b-a986-886d91c4d5d4" />
+<img width="2880" height="1702" alt="demo-weekly-3" src="https://github.com/user-attachments/assets/f2acd1ab-0e9a-4ab5-b427-acc8e507aa7c" />
+<img width="1500" height="500" alt="weekly" src="https://github.com/user-attachments/assets/721fab7d-4cde-4a97-90e2-b3e0a0dd09d6" />
 
-<img width="3672" height="1837" alt="screen-1" src="https://github.com/user-attachments/assets/95407c6c-14c6-40e7-8986-87029d333a6b" />
-<img width="3638" height="1787" alt="screen-2" src="https://github.com/user-attachments/assets/ca6bacfa-37ed-48b8-87de-e8bbe4e51ef6" />
 
-PS - Snapshots are not up-to-date. Please check live app - [Weekly](https:weekly.technologypro.in)
